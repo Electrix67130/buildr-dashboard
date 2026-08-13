@@ -71,7 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string) => {
     const result = await apiFetch<AuthResponse>("/auth/login", {
       method: "POST",
-      body: { email, password },
+      // Session web distincte de la session mobile : se connecter ici ne
+      // deconnecte plus l'utilisateur de son application.
+      body: { email, password, platform: "web" },
       skipAuth: true,
     });
     setTokens(result.access_token, result.refresh_token);
@@ -81,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const signup = useCallback(async (input: SignupInput) => {
     const result = await apiFetch<AuthResponse>("/auth/register", {
       method: "POST",
-      body: input,
+      body: { ...input, platform: "web" },
       skipAuth: true,
     });
     setTokens(result.access_token, result.refresh_token);
