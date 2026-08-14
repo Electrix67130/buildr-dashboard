@@ -18,9 +18,10 @@ export default function AdminErrorsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Erreurs serveur</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Erreurs</h1>
         <p className="text-sm text-zinc-500">
-          Toutes les exceptions non-gérées de l&apos;API. Sentry maison — zéro service externe.
+          Exceptions non gérées de l&apos;API et plantages remontés par l&apos;app mobile.
+          Suivi maison — aucun service externe, aucune donnée hors de l&apos;UE.
         </p>
       </div>
 
@@ -38,6 +39,17 @@ export default function AdminErrorsPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge variant={e.level === "error" ? "danger" : "warning"}>{e.level}</Badge>
+                      {e.source !== "api" ? (
+                        <Badge variant="info">
+                          {e.source}
+                          {e.platform ? ` · ${e.platform}` : ""}
+                        </Badge>
+                      ) : null}
+                      {e.screen ? (
+                        <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs dark:bg-zinc-800">
+                          {e.screen}
+                        </code>
+                      ) : null}
                       {e.method ? (
                         <code className="rounded bg-zinc-100 px-1.5 py-0.5 text-xs dark:bg-zinc-800">
                           {e.method} {e.route}
@@ -49,7 +61,9 @@ export default function AdminErrorsPage() {
                     </div>
                     <p className="mt-1 truncate text-sm text-zinc-900 dark:text-white">{e.message}</p>
                     <p className="mt-0.5 text-xs text-zinc-500">
-                      {e.user_email ?? "anonyme"} • req {e.request_id}
+                      {e.user_email ?? "anonyme"}
+                      {e.app_version ? ` • v${e.app_version}` : ""}
+                      {e.request_id ? ` • req ${e.request_id}` : ""}
                     </p>
                   </div>
                   <span className="whitespace-nowrap text-xs text-zinc-500">

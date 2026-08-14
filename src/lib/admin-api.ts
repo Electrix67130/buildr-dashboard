@@ -113,6 +113,11 @@ export interface ErrorEntry {
   user_email: string | null;
   status_code: number | null;
   request_id: string | null;
+  /** Origine du signalement : erreur serveur ou plantage client. */
+  source: "api" | "mobile" | "dashboard";
+  platform: "ios" | "android" | "web" | null;
+  app_version: string | null;
+  screen: string | null;
   created_at: string;
 }
 
