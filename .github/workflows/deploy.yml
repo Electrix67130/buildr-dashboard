@@ -1,0 +1,59 @@
+# Deploiement Buildr — dashboard web (app.getbuildr.fr).
+#
+# Sur push sur main : gate build Next.js, puis SSH sur le VPS et lancement de
+# /home/buildr/api/scripts/deploy-web.sh dashboard (git pull + docker build + up).
+#
+# Secrets GitHub requis (Settings -> Secrets and variables -> Actions) :
+#   SSH_HOST         IP ou hostname du VPS (ex. 51.15.214.102)
+#   SSH_USER         utilisateur de deploiement (= buildr)
+#   SSH_PRIVATE_KEY  cle privee SSH dont la publique est dans
+#                    ~buildr/.ssh/authorized_keys sur le VPS
+#   SSH_PORT         (optionnel) port SSH, defaut 22
+# Variable requise pour activer le job deploy :
+#   DEPLOY_ENABLED=true (onglet Variables)
+name: Deploy dashboard
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+# Un seul deploiement a la fois sur le VPS : deux builds Docker simultanes se
+# disputeraient le meme demon et le meme conteneur.
+concurrency:
+  group: deploy-vps
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: npm
+      - run: npm ci
+      - run: npx tsc --noEmit
+      # Le build sert de garde-fou : une page qui ne compile pas ne doit jamais
+      # partir en production. Les variables NEXT_PUBLIC_* reelles sont injectees
+      # au build Docker sur le VPS, pas ici.
+      - run: npm run build
+
+  deploy:
+    name: Deploy over SSH
+    needs: check
+    runs-on: ubuntu-latest
+    if: ${{ vars.DEPLOY_ENABLED == 'true' }}
+    steps:
+      - name: Run deploy-web.sh on the VPS
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || 22 }}
+          command_timeout: 20m
+          script_stop: true
+          script: /home/buildr/api/scripts/deploy-web.sh dashboard
