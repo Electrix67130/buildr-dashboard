@@ -56,11 +56,24 @@ interface Props {
   setForm: React.Dispatch<React.SetStateAction<OrgLegalFields>>;
   /** Appelé quand la raison sociale (name) est mise à jour via SIRET. */
   onAutofilledName?: (name: string) => void;
+  /**
+   * Champs à ne pas afficher. Sert à alléger le formulaire d'inscription : tout
+   * champ qui n'est pas exploité par l'application n'y a pas sa place, il ne
+   * fait qu'ajouter une étape entre l'invité et son compte. Ils restent
+   * modifiables plus tard dans les réglages.
+   */
+  hiddenFields?: Array<keyof OrgLegalFields>;
 }
 
-export default function OrgLegalFieldset({ form, setForm, onAutofilledName }: Props) {
+export default function OrgLegalFieldset({
+  form,
+  setForm,
+  onAutofilledName,
+  hiddenFields = [],
+}: Props) {
   const { t } = useI18n();
   const lookup = useSiretLookup();
+  const shows = (field: keyof OrgLegalFields) => !hiddenFields.includes(field);
 
   const set = <K extends keyof OrgLegalFields>(key: K, value: OrgLegalFields[K]) =>
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -185,14 +198,16 @@ export default function OrgLegalFieldset({ form, setForm, onAutofilledName }: Pr
             onChange={(e) => set("billing_email", e.target.value)}
             hint={t("settings.legal.billingEmailHint")}
           />
-          <Input
-            label={t("settings.legal.website")}
-            type="url"
-            placeholder="https://"
-            value={form.website}
-            onChange={(e) => set("website", e.target.value)}
-            className="sm:col-span-2"
-          />
+          {shows("website") ? (
+            <Input
+              label={t("settings.legal.website")}
+              type="url"
+              placeholder="https://"
+              value={form.website}
+              onChange={(e) => set("website", e.target.value)}
+              className="sm:col-span-2"
+            />
+          ) : null}
         </div>
       </div>
 

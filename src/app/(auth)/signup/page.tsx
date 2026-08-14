@@ -134,6 +134,10 @@ export default function SignupPage() {
             form={legal}
             setForm={setLegal}
             onAutofilledName={(name) => update("company_name", name)}
+            // Le site web n'est exploite nulle part dans l'application : il n'a
+            // pas sa place entre l'utilisateur et la creation de son compte.
+            // Il reste modifiable dans les reglages.
+            hiddenFields={["website"]}
           />
         </section>
 

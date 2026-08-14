@@ -5,15 +5,25 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   hint?: string;
+  /**
+   * Classes appliquees au champ lui-meme (padding pour une icone, alignement du
+   * texte...). `className` habille le conteneur : c'est lui qui porte le
+   * placement dans une grille ou un flex.
+   */
+  inputClassName?: string;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
-  { className, label, error, hint, id, ...rest },
+  { className, inputClassName, label, error, hint, id, ...rest },
   ref,
 ) {
   const inputId = id || rest.name;
   return (
-    <div className="flex flex-col gap-1.5">
+    // La className va au conteneur, pas au champ : c'est le conteneur qui est
+    // l'element de grille. Appliquee au <input>, un `col-span-2` n'avait aucun
+    // effet — tous les champs occupaient une colonne, d'ou des libelles trop a
+    // l'etroit qui passaient sur deux lignes et desalignaient la rangee.
+    <div className={cn("flex min-w-0 flex-col gap-1.5", className)}>
       {label ? (
         <label htmlFor={inputId} className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
           {label}
@@ -27,7 +37,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
           error
             ? "border-red-500 focus:border-red-500"
             : "border-zinc-300 focus:border-orange-500 dark:border-zinc-700",
-          className,
+          inputClassName,
         )}
         {...rest}
       />

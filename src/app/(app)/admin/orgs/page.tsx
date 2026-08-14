@@ -67,7 +67,7 @@ export default function AdminOrgsPage() {
         <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <Input
           placeholder="Rechercher par nom…"
-          className="pl-9"
+          inputClassName="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />

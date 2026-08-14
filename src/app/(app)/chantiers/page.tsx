@@ -90,7 +90,7 @@ export default function ChantiersPage() {
           />
           <Input
             placeholder={t("chantiers.searchPlaceholder")}
-            className="pl-9"
+            inputClassName="pl-9"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />

@@ -79,7 +79,7 @@ export default function AdminChantiersPage() {
             />
             <Input
               placeholder="Rechercher (nom, adresse, ville)…"
-              className="pl-9"
+              inputClassName="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
