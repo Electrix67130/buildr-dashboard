@@ -412,6 +412,9 @@ const en: Dict = {
   "invite.expiredBody": "This link is no longer valid. Ask the person who invited you for a new invitation.",
   "invite.invalidTitle": "Invitation not found",
   "invite.invalidBody": "This link is invalid or has already been used. If you already have an account, sign in.",
+
+  // Invitations
+  "admin.chantiers": "Sites",
 };
 
 export default en;

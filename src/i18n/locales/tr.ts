@@ -400,6 +400,19 @@ const tr: Dict = {
   "admin.users": "Kullanıcılar",
   "admin.audit": "Denetim günlüğü",
   "admin.errors": "Hatalar",
+
+  // Invitations
+  "admin.chantiers": "Şantiyeler",
+  "invite.title": "{org} ekibine katıl",
+  "invite.subtitle": "Hesabınızı oluşturmak için bir şifre seçin.",
+  "invite.role": "Rol",
+  "invite.accept": "Hesabımı oluştur",
+  "invite.welcome": "{org} ekibine hoş geldiniz",
+  "invite.mobileHint": "Hesabınız oluşturulduğunda şantiyelerinizi Buildr mobil uygulamasında bulabilirsiniz.",
+  "invite.expiredTitle": "Davet süresi doldu",
+  "invite.expiredBody": "Bu bağlantı artık geçerli değil. Sizi davet eden kişiden yeni bir davet isteyin.",
+  "invite.invalidTitle": "Davet bulunamadı",
+  "invite.invalidBody": "Bu bağlantı geçersiz veya daha önce kullanılmış. Zaten bir hesabınız varsa giriş yapın.",
 };
 
 export default tr;

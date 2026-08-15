@@ -400,6 +400,19 @@ const de: Dict = {
   "admin.users": "Benutzer",
   "admin.audit": "Audit-Log",
   "admin.errors": "Fehler",
+
+  // Invitations
+  "admin.chantiers": "Baustellen",
+  "invite.title": "{org} beitreten",
+  "invite.subtitle": "Wählen Sie ein Passwort, um Ihr Konto zu erstellen.",
+  "invite.role": "Rolle",
+  "invite.accept": "Konto erstellen",
+  "invite.welcome": "Willkommen bei {org}",
+  "invite.mobileHint": "Sobald Ihr Konto erstellt ist, finden Sie Ihre Baustellen in der Buildr-App.",
+  "invite.expiredTitle": "Einladung abgelaufen",
+  "invite.expiredBody": "Dieser Link ist nicht mehr gültig. Bitten Sie die Person, die Sie eingeladen hat, um eine neue Einladung.",
+  "invite.invalidTitle": "Einladung nicht gefunden",
+  "invite.invalidBody": "Dieser Link ist ungültig oder wurde bereits verwendet. Wenn Sie bereits ein Konto haben, melden Sie sich an.",
 };
 
 export default de;

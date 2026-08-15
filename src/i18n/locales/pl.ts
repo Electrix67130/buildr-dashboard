@@ -400,6 +400,19 @@ const pl: Dict = {
   "admin.users": "Użytkownicy",
   "admin.audit": "Dziennik audytu",
   "admin.errors": "Błędy",
+
+  // Invitations
+  "admin.chantiers": "Budowy",
+  "invite.title": "Dołącz do {org}",
+  "invite.subtitle": "Wybierz hasło, aby utworzyć konto.",
+  "invite.role": "Rola",
+  "invite.accept": "Utwórz konto",
+  "invite.welcome": "Witamy w {org}",
+  "invite.mobileHint": "Po utworzeniu konta znajdziesz swoje budowy w aplikacji mobilnej Buildr.",
+  "invite.expiredTitle": "Zaproszenie wygasło",
+  "invite.expiredBody": "Ten link nie jest już ważny. Poproś osobę, która Cię zaprosiła, o nowe zaproszenie.",
+  "invite.invalidTitle": "Nie znaleziono zaproszenia",
+  "invite.invalidBody": "Ten link jest nieprawidłowy lub został już użyty. Jeśli masz już konto, zaloguj się.",
 };
 
 export default pl;
