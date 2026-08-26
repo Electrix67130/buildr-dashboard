@@ -86,8 +86,12 @@ export async function apiFetch<T = unknown>(path: string, options: FetchOptions 
   const { method = "GET", body, headers = {}, skipAuth = false, retry = true } = options;
 
   const finalHeaders: Record<string, string> = {
-    "Content-Type": "application/json",
     "x-api-key": API_KEY,
+    // Content-Type seulement s'il y a vraiment un corps. Annoncer du JSON sans
+    // en envoyer fait rejeter la requete par Fastify en 400
+    // (FST_ERR_CTP_EMPTY_JSON_BODY), avant meme d'atteindre le handler : c'est
+    // ce qui cassait la corbeille des invitations, un DELETE sans corps.
+    ...(body !== undefined ? { "Content-Type": "application/json" } : {}),
     ...headers,
   };
 
