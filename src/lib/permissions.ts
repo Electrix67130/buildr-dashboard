@@ -22,10 +22,17 @@ export const canSeeOrgTeamSection = (user: User | null): boolean =>
 export const canSeeTemplatesSection = (user: User | null): boolean =>
   !!user && user.role !== "client" && user.role !== "gestionnaire_reseau";
 
-export const canSeeBillingSection = (user: User | null): boolean =>
-  user?.role === "admin";
-
 export const isSuperAdmin = (user: User | null): boolean => !!user?.is_super_admin;
+
+/**
+ * Abonnement : masque tant que la facturation n'est pas ouverte.
+ *
+ * Reserve au super admin pour l'instant — la page annonce un tarif par siege
+ * alors que la beta est gratuite, ce qui induirait les clients en erreur. Elle
+ * reste accessible en interne pour verifier le decompte des sieges.
+ * Repasser sur `user?.role === "admin"` a l'ouverture de la facturation.
+ */
+export const canSeeBillingSection = (user: User | null): boolean => isSuperAdmin(user);
 
 // ---------- Chantiers (liste) ----------
 
