@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Plus } from "lucide-react";
+import { FileText, Pencil, Plus } from "lucide-react";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
-import CreateTemplateModal from "@/components/templates/CreateTemplateModal";
+import TemplateModal from "@/components/templates/TemplateModal";
 import { apiFetch } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,8 @@ export default function TemplatesPage() {
   const { user } = useAuth();
   const canCreate = user?.role === "admin" || user?.role === "manager";
   const [createOpen, setCreateOpen] = useState(false);
+  // Modele en cours d'edition. Le meme modal sert a creer et a modifier.
+  const [editing, setEditing] = useState<ChantierTemplate | null>(null);
 
   const list = useQuery({
     queryKey: ["chantier-templates"],
@@ -39,7 +41,12 @@ export default function TemplatesPage() {
         ) : null}
       </div>
 
-      <CreateTemplateModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      <TemplateModal open={createOpen} onClose={() => setCreateOpen(false)} />
+      <TemplateModal
+        open={editing !== null}
+        template={editing}
+        onClose={() => setEditing(null)}
+      />
 
       {list.isLoading ? (
         <Card>
@@ -62,6 +69,17 @@ export default function TemplatesPage() {
                     {t("templates.createdOn", { date: formatDate(tpl.created_at) })}
                   </p>
                 </div>
+                {canCreate ? (
+                  <button
+                    type="button"
+                    onClick={() => setEditing(tpl)}
+                    aria-label={t("templates.edit")}
+                    title={t("templates.edit")}
+                    className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                ) : null}
               </div>
             </Card>
           ))}

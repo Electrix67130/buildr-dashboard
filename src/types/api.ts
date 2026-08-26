@@ -220,11 +220,28 @@ export interface ChantierMember {
   created_at: string;
 }
 
+export interface ChantierTemplateSubstep {
+  id: string;
+  name: string;
+  position: number;
+}
+
+export interface ChantierTemplateStep {
+  id: string;
+  name: string;
+  position: number;
+  substeps: ChantierTemplateSubstep[];
+}
+
 export interface ChantierTemplate {
   id: string;
   organization_id: string;
   name: string;
-  description?: string;
+  description?: string | null;
+  /** Statut applique aux chantiers crees depuis ce modele. */
+  default_status: ChantierStatus;
+  /** Renvoye par GET /chantier-templates et /chantier-templates/:id, deja trie par position. */
+  steps: ChantierTemplateStep[];
   created_by: string;
   created_at: string;
   updated_at: string;

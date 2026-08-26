@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, GripVertical } from "lucide-react";
 import Modal from "@/components/ui/Modal";
@@ -15,7 +15,9 @@ import type { ChantierStatus, ChantierTemplate } from "@/types/api";
 interface Props {
   open: boolean;
   onClose: () => void;
-  onCreated?: (template: ChantierTemplate) => void;
+  /** Modele a editer. Absent ou null : le modal cree un nouveau modele. */
+  template?: ChantierTemplate | null;
+  onSaved?: (template: ChantierTemplate) => void;
 }
 
 interface SubstepDraft {
@@ -40,7 +42,8 @@ const makeSubstep = (): SubstepDraft => ({
   name: "",
 });
 
-export default function CreateTemplateModal({ open, onClose, onCreated }: Props) {
+export default function TemplateModal({ open, onClose, template, onSaved }: Props) {
+  const isEdit = Boolean(template);
   const { t } = useI18n();
   const qc = useQueryClient();
   const [name, setName] = useState("");
@@ -49,6 +52,47 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
   const [steps, setSteps] = useState<StepDraft[]>([makeStep()]);
   const [error, setError] = useState<string | null>(null);
 
+  // Reordonnancement des etapes.
+  // `armedKey` : la carte n'est rendue `draggable` que pendant l'appui sur sa
+  // poignee. Sans ca, toute la carte serait saisissable et le glisser
+  // empecherait de selectionner le texte dans les champs qu'elle contient.
+  const [armedKey, setArmedKey] = useState<string | null>(null);
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [overKey, setOverKey] = useState<string | null>(null);
+
+  const endDrag = () => {
+    setArmedKey(null);
+    setDragKey(null);
+    setOverKey(null);
+  };
+
+  /** Deplace l'etape `fromKey` a la position de `toKey`. */
+  const moveStepTo = (fromKey: string, toKey: string) => {
+    if (fromKey === toKey) return;
+    setSteps((prev) => {
+      const from = prev.findIndex((s) => s.key === fromKey);
+      const to = prev.findIndex((s) => s.key === toKey);
+      if (from === -1 || to === -1) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
+  /** Deplace d'un cran. Sert au clavier : le glisser seul est inaccessible. */
+  const moveStepBy = (key: string, delta: number) => {
+    setSteps((prev) => {
+      const from = prev.findIndex((s) => s.key === key);
+      const to = from + delta;
+      if (from === -1 || to < 0 || to >= prev.length) return prev;
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  };
+
   const reset = () => {
     setName("");
     setDescription("");
@@ -56,6 +100,31 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
     setSteps([makeStep()]);
     setError(null);
   };
+
+  // Amorce le formulaire a l'ouverture. Les `key` sont regenerees plutot que
+  // reprises des `id` du serveur : elles n'identifient que les lignes du
+  // brouillon, et le PATCH renvoie de toute facon des etapes recreees.
+  useEffect(() => {
+    if (!open) return;
+    if (!template) {
+      reset();
+      return;
+    }
+    setName(template.name);
+    setDescription(template.description ?? "");
+    setDefaultStatus(template.default_status);
+    setSteps(
+      template.steps.length > 0
+        ? template.steps.map((step) => ({
+            key: crypto.randomUUID(),
+            name: step.name,
+            substeps: step.substeps.map((sub) => ({ key: crypto.randomUUID(), name: sub.name })),
+          }))
+        : [makeStep()],
+    );
+    setError(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, template]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -75,14 +144,14 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
       };
       if (description.trim()) body.description = description.trim();
 
-      return apiFetch<ChantierTemplate>("/chantier-templates", {
-        method: "POST",
-        body,
-      });
+      return apiFetch<ChantierTemplate>(
+        template ? `/chantier-templates/${template.id}` : "/chantier-templates",
+        { method: template ? "PATCH" : "POST", body },
+      );
     },
     onSuccess: (tpl) => {
       qc.invalidateQueries({ queryKey: ["chantier-templates"] });
-      onCreated?.(tpl);
+      onSaved?.(tpl);
       reset();
       onClose();
     },
@@ -142,7 +211,7 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
     <Modal
       open={open}
       onClose={mutation.isPending ? () => {} : onClose}
-      title={t("templates.new")}
+      title={isEdit ? t("templates.edit") : t("templates.new")}
       subtitle={t("templates.form.subtitle")}
       size="xl"
       footer={
@@ -151,7 +220,7 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
             {t("common.cancel")}
           </Button>
           <Button onClick={handleSubmit} loading={mutation.isPending}>
-            {t("templates.form.submit")}
+            {isEdit ? t("common.save") : t("templates.form.submit")}
           </Button>
         </>
       }
@@ -202,10 +271,53 @@ export default function CreateTemplateModal({ open, onClose, onCreated }: Props)
           {steps.map((step, idx) => (
             <div
               key={step.key}
-              className="rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 dark:border-zinc-800 dark:bg-zinc-900/40"
+              draggable={armedKey === step.key}
+              onDragStart={(e) => {
+                setDragKey(step.key);
+                e.dataTransfer.effectAllowed = "move";
+                e.dataTransfer.setData("text/plain", step.key);
+              }}
+              onDragOver={(e) => {
+                if (!dragKey || dragKey === step.key) return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = "move";
+                setOverKey(step.key);
+              }}
+              onDragLeave={() => setOverKey((k) => (k === step.key ? null : k))}
+              onDrop={(e) => {
+                e.preventDefault();
+                if (dragKey) moveStepTo(dragKey, step.key);
+                endDrag();
+              }}
+              onDragEnd={endDrag}
+              className={`rounded-lg border bg-zinc-50/50 p-3 transition-colors dark:bg-zinc-900/40 ${
+                dragKey === step.key
+                  ? "border-orange-400 opacity-50"
+                  : overKey === step.key
+                    ? "border-orange-400 border-dashed"
+                    : "border-zinc-200 dark:border-zinc-800"
+              }`}
             >
               <div className="flex items-center gap-2">
-                <GripVertical size={16} className="flex-shrink-0 text-zinc-400" />
+                <button
+                  type="button"
+                  onMouseDown={() => setArmedKey(step.key)}
+                  onMouseUp={() => setArmedKey(null)}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowUp") {
+                      e.preventDefault();
+                      moveStepBy(step.key, -1);
+                    } else if (e.key === "ArrowDown") {
+                      e.preventDefault();
+                      moveStepBy(step.key, 1);
+                    }
+                  }}
+                  aria-label={t("templates.form.reorderStep")}
+                  title={t("templates.form.reorderStep")}
+                  className="flex-shrink-0 cursor-grab rounded text-zinc-400 hover:text-zinc-600 active:cursor-grabbing dark:hover:text-zinc-300"
+                >
+                  <GripVertical size={16} />
+                </button>
                 <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-orange-100 text-xs font-bold text-orange-700 dark:bg-orange-900/30 dark:text-orange-300">
                   {idx + 1}
                 </span>
