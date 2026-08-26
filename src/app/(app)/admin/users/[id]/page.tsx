@@ -13,6 +13,7 @@ import { adminApi } from "@/lib/admin-api";
 import { formatDate, formatDateTime } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { useConfirm, useAlert } from "@/contexts/DialogContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface UserDetail {
   id: string;
@@ -34,6 +35,7 @@ interface UserDetail {
 }
 
 export default function AdminUserDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useI18n();
   const { id } = use(params);
   const qc = useQueryClient();
   const router = useRouter();
@@ -50,21 +52,21 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
   const enable = useMutation({
     mutationFn: () => adminApi.enableUser(id),
     onSuccess: () => {
-      toast.success("Utilisateur réactivé");
+      toast.success(t("admin.userReactivated"));
       invalidate();
     },
   });
   const disable = useMutation({
     mutationFn: () => adminApi.disableUser(id),
     onSuccess: () => {
-      toast.success("Utilisateur désactivé + sessions tuées");
+      toast.success(t("admin.userDeactivatedToast"));
       invalidate();
     },
   });
   const kick = useMutation({
     mutationFn: () => adminApi.kickSessions(id),
     onSuccess: (data) => {
-      toast.success(`${data.sessions_killed} session${data.sessions_killed > 1 ? "s" : ""} terminée${data.sessions_killed > 1 ? "s" : ""}`);
+      toast.success(t("admin.sessionsKilled", { count: data.sessions_killed }));
       invalidate();
     },
   });
@@ -72,8 +74,8 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
     mutationFn: () => adminApi.forceReset(id),
     onSuccess: (data) => {
       showAlert({
-        title: "Mot de passe temporaire",
-        description: `${data.temporary_password}\n\nTransmets-le à l'utilisateur, il devra le changer après login.`,
+        title: t("admin.tempPassword"),
+        description: t("admin.tempPasswordBody", { password: data.temporary_password }),
         tone: "info",
       });
     },
@@ -81,7 +83,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
   const remove = useMutation({
     mutationFn: () => adminApi.deleteUser(id),
     onSuccess: () => {
-      toast.success("Utilisateur supprimé");
+      toast.success(t("admin.userDeleted"));
       router.replace("/admin/users");
     },
   });
@@ -97,9 +99,9 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
           Retour aux utilisateurs
         </Link>
         {isLoading ? (
-          <h1 className="text-2xl font-bold text-zinc-400">Chargement…</h1>
+          <h1 className="text-2xl font-bold text-zinc-400">{t("common.loading")}</h1>
         ) : error || !data ? (
-          <h1 className="text-2xl font-bold text-red-600">Utilisateur introuvable</h1>
+          <h1 className="text-2xl font-bold text-red-600">{t("admin.userNotFound")}</h1>
         ) : (
           <div className="flex items-center gap-3">
             <Avatar firstName={data.first_name} lastName={data.last_name} size="lg" />
@@ -108,7 +110,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
                 <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
                   {data.first_name} {data.last_name}
                 </h1>
-                {!data.is_active ? <Badge variant="danger">Désactivé</Badge> : null}
+                {!data.is_active ? <Badge variant="danger">{t("admin.userDeactivatedBadge")}</Badge> : null}
                 {data.is_super_admin ? <Badge variant="info">Super admin</Badge> : null}
               </div>
               <p className="text-sm text-zinc-500">{data.email}</p>
@@ -125,7 +127,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
               onClick={async () => {
                 const ok = await confirm({
                   title: "Reset password",
-                  description: `Forcer reset password pour ${data.email} ?`,
+                  description: t("admin.confirmForceReset", { email: data.email }),
                   confirmLabel: "Reset",
                 });
                 if (ok) reset.mutate();
@@ -139,7 +141,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
               onClick={async () => {
                 const ok = await confirm({
                   title: "Kick sessions",
-                  description: `Tuer toutes les sessions actives de ${data.email} ?`,
+                  description: t("admin.confirmKickSessions", { email: data.email }),
                   confirmLabel: "Kick",
                   tone: "danger",
                 });
@@ -154,9 +156,9 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
                 variant="danger"
                 onClick={async () => {
                   const ok = await confirm({
-                    title: "Désactiver",
-                    description: `Désactiver ${data.email} ? (kick sessions inclus)`,
-                    confirmLabel: "Désactiver",
+                    title: t("admin.deactivate"),
+                    description: t("admin.confirmDisableUser", { email: data.email }),
+                    confirmLabel: t("admin.deactivate"),
                     tone: "danger",
                   });
                   if (ok) disable.mutate();
@@ -175,9 +177,9 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
               variant="danger"
               onClick={async () => {
                 const ok = await confirm({
-                  title: "Suppression définitive",
-                  description: `SUPPRIMER DÉFINITIVEMENT ${data.email} ?\n\nIrréversible. RGPD-compliant.`,
-                  confirmLabel: "Supprimer",
+                  title: t("admin.permanentDelete"),
+                  description: t("admin.confirmDeleteUser", { email: data.email }),
+                  confirmLabel: t("common.delete"),
                   tone: "danger",
                 });
                 if (ok) remove.mutate();
@@ -189,18 +191,18 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
           </div>
 
           <Card>
-            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">Détails</h2>
+            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">{t("chantier.details")}</h2>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Email</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{data.email}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Téléphone</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("team.phone")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{data.phone || "—"}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Inscrit le</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("admin.registeredOn")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{formatDate(data.created_at)}</dd>
               </div>
               <div>
@@ -242,7 +244,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
                 ))}
               </ul>
             ) : (
-              <p className="p-6 text-sm text-zinc-500">Aucune membership.</p>
+              <p className="p-6 text-sm text-zinc-500">{t("admin.noMembership")}</p>
             )}
           </Card>
         </>

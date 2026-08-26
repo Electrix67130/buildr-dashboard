@@ -13,8 +13,10 @@ import { formatDate } from "@/lib/utils";
 import { setTokens } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { useConfirm } from "@/contexts/DialogContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function AdminOrgsPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const qc = useQueryClient();
   const confirm = useConfirm();
@@ -30,14 +32,14 @@ export default function AdminOrgsPage() {
   const enable = useMutation({
     mutationFn: adminApi.enableOrg,
     onSuccess: () => {
-      toast.success("Organisation réactivée");
+      toast.success(t("admin.orgReactivated"));
       invalidate();
     },
   });
   const disable = useMutation({
     mutationFn: adminApi.disableOrg,
     onSuccess: () => {
-      toast.success("Organisation désactivée");
+      toast.success(t("admin.orgDeactivated"));
       invalidate();
     },
   });
@@ -48,16 +50,16 @@ export default function AdminOrgsPage() {
       // On stocke le JWT temporaire (30 min) à la place de l'access_token, le refresh
       // existant continue de fonctionner avec ton compte super_admin.
       setTokens(data.access_token, "");
-      toast.success("Connecté en tant qu'admin de l'orga (30 min)");
+      toast.success(t("admin.loggedInAsOrgAdmin"));
       router.replace("/dashboard");
     },
-    onError: () => toast.error("Aucun admin dans cette orga"),
+    onError: () => toast.error(t("admin.noAdminInOrg")),
   });
 
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Organisations</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.orgs")}</h1>
         <p className="text-sm text-zinc-500">
           {data?.meta.total ?? 0} organisation{(data?.meta.total ?? 0) > 1 ? "s" : ""}
         </p>
@@ -66,7 +68,7 @@ export default function AdminOrgsPage() {
       <div className="relative max-w-md">
         <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <Input
-          placeholder="Rechercher par nom…"
+          placeholder={t("admin.searchByName")}
           inputClassName="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -75,7 +77,7 @@ export default function AdminOrgsPage() {
 
       <Card className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-zinc-500">Chargement…</p>
+          <p className="p-6 text-sm text-zinc-500">{t("common.loading")}</p>
         ) : data && data.data.length > 0 ? (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {data.data.map((o) => (
@@ -83,7 +85,7 @@ export default function AdminOrgsPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="truncate font-medium text-zinc-900 dark:text-white">{o.name}</p>
-                    {!o.is_active ? <Badge variant="danger">Désactivée</Badge> : null}
+                    {!o.is_active ? <Badge variant="danger">{t("admin.orgDeactivatedBadge")}</Badge> : null}
                   </div>
                   <p className="mt-0.5 text-xs text-zinc-500">
                     {o.member_count} membres • {o.chantier_count} chantiers actifs • créée le {formatDate(o.created_at)}
@@ -95,7 +97,7 @@ export default function AdminOrgsPage() {
                   onClick={async () => {
                     const ok = await confirm({
                       title: `Impersonate ${o.name}`,
-                      description: `Se connecter en tant qu'admin de "${o.name}" ?\n\nUn JWT temporaire de 30 min sera créé, action loggée dans audit_log.`,
+                      description: t("admin.confirmImpersonate", { name: o.name }),
                       confirmLabel: "Impersonate",
                     });
                     if (ok) impersonate.mutate(o.id);
@@ -112,8 +114,8 @@ export default function AdminOrgsPage() {
                     onClick={async () => {
                       const ok = await confirm({
                         title: `Désactiver ${o.name}`,
-                        description: `Désactiver "${o.name}" ? Les membres ne pourront plus se connecter.`,
-                        confirmLabel: "Désactiver",
+                        description: t("admin.confirmDisableOrg", { name: o.name }),
+                        confirmLabel: t("admin.deactivate"),
                         tone: "danger",
                       });
                       if (ok) disable.mutate(o.id);
@@ -132,7 +134,7 @@ export default function AdminOrgsPage() {
             ))}
           </ul>
         ) : (
-          <p className="p-6 text-sm text-zinc-500">Aucune organisation.</p>
+          <p className="p-6 text-sm text-zinc-500">{t("admin.noOrg")}</p>
         )}
       </Card>
     </div>

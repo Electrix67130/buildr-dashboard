@@ -11,8 +11,10 @@ import Button from "@/components/ui/Button";
 import { adminApi } from "@/lib/admin-api";
 import { formatDate } from "@/lib/utils";
 import { useConfirm, useAlert } from "@/contexts/DialogContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function AdminUsersPage() {
+  const { t } = useI18n();
   const qc = useQueryClient();
   const confirm = useConfirm();
   const showAlert = useAlert();
@@ -28,29 +30,29 @@ export default function AdminUsersPage() {
   const enable = useMutation({
     mutationFn: adminApi.enableUser,
     onSuccess: () => {
-      toast.success("Utilisateur réactivé");
+      toast.success(t("admin.userReactivated"));
       invalidate();
     },
   });
   const disable = useMutation({
     mutationFn: adminApi.disableUser,
     onSuccess: () => {
-      toast.success("Utilisateur désactivé + sessions tuées");
+      toast.success(t("admin.userDeactivatedToast"));
       invalidate();
     },
   });
   const kick = useMutation({
     mutationFn: adminApi.kickSessions,
     onSuccess: (data) => {
-      toast.success(`${data.sessions_killed} session${data.sessions_killed > 1 ? "s" : ""} terminée${data.sessions_killed > 1 ? "s" : ""}`);
+      toast.success(t("admin.sessionsKilled", { count: data.sessions_killed }));
     },
   });
   const reset = useMutation({
     mutationFn: adminApi.forceReset,
     onSuccess: (data) => {
       showAlert({
-        title: "Mot de passe temporaire",
-        description: `${data.temporary_password}\n\nTransmettez-le à l'utilisateur, il devra le changer après login.`,
+        title: t("admin.tempPassword"),
+        description: t("admin.tempPasswordBody", { password: data.temporary_password }),
         tone: "info",
       });
     },
@@ -58,7 +60,7 @@ export default function AdminUsersPage() {
   const remove = useMutation({
     mutationFn: adminApi.deleteUser,
     onSuccess: () => {
-      toast.success("Utilisateur supprimé");
+      toast.success(t("admin.userDeleted"));
       invalidate();
     },
   });
@@ -66,7 +68,7 @@ export default function AdminUsersPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Utilisateurs</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.users")}</h1>
         <p className="text-sm text-zinc-500">
           {data?.meta.total ?? 0} utilisateur{(data?.meta.total ?? 0) > 1 ? "s" : ""}
         </p>
@@ -75,7 +77,7 @@ export default function AdminUsersPage() {
       <div className="relative max-w-md">
         <Search size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
         <Input
-          placeholder="Rechercher (email, nom)…"
+          placeholder={t("admin.searchUser")}
           inputClassName="pl-9"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
@@ -84,7 +86,7 @@ export default function AdminUsersPage() {
 
       <Card className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-zinc-500">Chargement…</p>
+          <p className="p-6 text-sm text-zinc-500">{t("common.loading")}</p>
         ) : data && data.data.length > 0 ? (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {data.data.map((u) => (
@@ -94,7 +96,7 @@ export default function AdminUsersPage() {
                     <p className="truncate font-medium text-zinc-900 dark:text-white">
                       {u.first_name} {u.last_name}
                     </p>
-                    {!u.is_active ? <Badge variant="danger">Désactivé</Badge> : null}
+                    {!u.is_active ? <Badge variant="danger">{t("admin.userDeactivatedBadge")}</Badge> : null}
                     {u.is_super_admin ? <Badge variant="info">Super admin</Badge> : null}
                   </div>
                   <p className="truncate text-sm text-zinc-500">
@@ -109,7 +111,7 @@ export default function AdminUsersPage() {
                   onClick={async () => {
                     const ok = await confirm({
                       title: "Reset password",
-                      description: `Forcer reset password pour ${u.email} ?`,
+                      description: t("admin.confirmForceReset", { email: u.email }),
                       confirmLabel: "Reset",
                     });
                     if (ok) reset.mutate(u.id);
@@ -124,7 +126,7 @@ export default function AdminUsersPage() {
                   onClick={async () => {
                     const ok = await confirm({
                       title: "Kick sessions",
-                      description: `Tuer toutes les sessions actives de ${u.email} ?`,
+                      description: t("admin.confirmKickSessions", { email: u.email }),
                       confirmLabel: "Kick",
                       tone: "danger",
                     });
@@ -140,9 +142,9 @@ export default function AdminUsersPage() {
                     size="sm"
                     onClick={async () => {
                       const ok = await confirm({
-                        title: "Désactiver",
-                        description: `Désactiver ${u.email} ? (kick sessions inclus)`,
-                        confirmLabel: "Désactiver",
+                        title: t("admin.deactivate"),
+                        description: t("admin.confirmDisableUser", { email: u.email }),
+                        confirmLabel: t("admin.deactivate"),
                         tone: "danger",
                       });
                       if (ok) disable.mutate(u.id);
@@ -160,9 +162,9 @@ export default function AdminUsersPage() {
                   size="sm"
                   onClick={async () => {
                     const ok = await confirm({
-                      title: "Suppression définitive",
-                      description: `SUPPRIMER DÉFINITIVEMENT ${u.email} ?\n\nIrréversible. RGPD-compliant.`,
-                      confirmLabel: "Supprimer",
+                      title: t("admin.permanentDelete"),
+                      description: t("admin.confirmDeleteUser", { email: u.email }),
+                      confirmLabel: t("common.delete"),
                       tone: "danger",
                     });
                     if (ok) remove.mutate(u.id);
@@ -175,7 +177,7 @@ export default function AdminUsersPage() {
             ))}
           </ul>
         ) : (
-          <p className="p-6 text-sm text-zinc-500">Aucun utilisateur.</p>
+          <p className="p-6 text-sm text-zinc-500">{t("admin.noUser")}</p>
         )}
       </Card>
     </div>

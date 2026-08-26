@@ -5,8 +5,10 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { adminApi } from "@/lib/admin-api";
 import { formatDateTime } from "@/lib/utils";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function AdminAuditPage() {
+  const { t } = useI18n();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "audit"],
     queryFn: () => adminApi.audit(),
@@ -16,7 +18,7 @@ export default function AdminAuditPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Journal d&apos;audit</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.auditTitle")}</h1>
         <p className="text-sm text-zinc-500">
           Toutes les actions super_admin sont logguées ici (qui, quoi, quand).
         </p>
@@ -24,7 +26,7 @@ export default function AdminAuditPage() {
 
       <Card className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-zinc-500">Chargement…</p>
+          <p className="p-6 text-sm text-zinc-500">{t("common.loading")}</p>
         ) : data && data.data.length > 0 ? (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {data.data.map((e) => (
@@ -50,7 +52,7 @@ export default function AdminAuditPage() {
             ))}
           </ul>
         ) : (
-          <p className="p-6 text-sm text-zinc-500">Aucune action loggée.</p>
+          <p className="p-6 text-sm text-zinc-500">{t("admin.noAuditAction")}</p>
         )}
       </Card>
     </div>

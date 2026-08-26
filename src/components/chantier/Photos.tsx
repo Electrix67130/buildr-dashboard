@@ -104,7 +104,7 @@ export default function Photos({
               <button
                 onClick={() => setSelected(p)}
                 className="block h-full w-full"
-                aria-label="Voir la photo"
+                aria-label={t("photos.viewPhoto")}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img

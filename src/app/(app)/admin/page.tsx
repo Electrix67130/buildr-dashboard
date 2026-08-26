@@ -6,8 +6,10 @@ import { Building2, Users, FolderArchive, Wallet } from "lucide-react";
 import Card from "@/components/ui/Card";
 import { adminApi } from "@/lib/admin-api";
 import { formatDate } from "@/lib/utils";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function AdminOverviewPage() {
+  const { t } = useI18n();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "overview"],
     queryFn: () => adminApi.overview(),
@@ -17,21 +19,21 @@ export default function AdminOverviewPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Vue d&apos;ensemble plateforme</h1>
-        <p className="text-sm text-zinc-500">Toutes les organisations confondues.</p>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.overviewTitle")}</h1>
+        <p className="text-sm text-zinc-500">{t("admin.allOrgsCombined")}</p>
       </div>
 
       {isLoading || !data ? (
-        <Card>Chargement…</Card>
+        <Card>{t("common.loading")}</Card>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-            <Stat icon={<Building2 size={20} />} label="Organisations" value={data.orgs.total} sub={`${data.orgs.active} actives`} />
-            <Stat icon={<Users size={20} />} label="Utilisateurs" value={data.users.total} sub={`${data.users.active} actifs`} />
-            <Stat icon={<FolderArchive size={20} />} label="Chantiers" value={data.chantiers.active} sub={`${data.chantiers.archived} archivés`} />
+            <Stat icon={<Building2 size={20} />} label={t("admin.orgs")} value={data.orgs.total} sub={`${data.orgs.active} actives`} />
+            <Stat icon={<Users size={20} />} label={t("admin.users")} value={data.users.total} sub={`${data.users.active} actifs`} />
+            <Stat icon={<FolderArchive size={20} />} label={t("nav.chantiers")} value={data.chantiers.active} sub={`${data.chantiers.archived} archivés`} />
             <Stat
               icon={<Wallet size={20} />}
-              label="Sièges facturables"
+              label={t("admin.billableSeats")}
               value={data.billing.billable_seats}
               sub={`~ ${data.billing.estimated_monthly_eur}€ / mois`}
             />

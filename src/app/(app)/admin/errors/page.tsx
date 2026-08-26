@@ -6,8 +6,10 @@ import Card from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import { adminApi, ErrorEntry } from "@/lib/admin-api";
 import { formatDateTime } from "@/lib/utils";
+import { useI18n } from "@/contexts/I18nContext";
 
 export default function AdminErrorsPage() {
+  const { t } = useI18n();
   const [selected, setSelected] = useState<ErrorEntry | null>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "errors"],
@@ -18,7 +20,7 @@ export default function AdminErrorsPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Erreurs</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.errorsTitle")}</h1>
         <p className="text-sm text-zinc-500">
           Exceptions non gérées de l&apos;API et plantages remontés par l&apos;app mobile.
           Suivi maison — aucun service externe, aucune donnée hors de l&apos;UE.
@@ -27,7 +29,7 @@ export default function AdminErrorsPage() {
 
       <Card className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-zinc-500">Chargement…</p>
+          <p className="p-6 text-sm text-zinc-500">{t("common.loading")}</p>
         ) : data && data.data.length > 0 ? (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {data.data.map((e) => (
@@ -74,7 +76,7 @@ export default function AdminErrorsPage() {
             ))}
           </ul>
         ) : (
-          <p className="p-6 text-sm text-zinc-500">Aucune erreur enregistrée. 🎉</p>
+          <p className="p-6 text-sm text-zinc-500">{t("admin.noError")}</p>
         )}
       </Card>
 

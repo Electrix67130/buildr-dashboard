@@ -9,11 +9,12 @@ import Badge from "@/components/ui/Badge";
 import Avatar from "@/components/ui/Avatar";
 import { adminApi, type ChantierStatus } from "@/lib/admin-api";
 import { formatDate, formatDateTime } from "@/lib/utils";
+import { useI18n } from "@/contexts/I18nContext";
 
-const STATUS_LABEL: Record<ChantierStatus, string> = {
-  a_venir: "À venir",
-  en_cours: "En cours",
-  termine: "Terminé",
+const STATUS_LABEL_KEYS: Record<ChantierStatus, string> = {
+  a_venir: "chantiers.statusUpcoming",
+  en_cours: "chantiers.statusInProgress",
+  termine: "chantiers.statusCompleted",
 };
 
 const STATUS_VARIANT: Record<ChantierStatus, "default" | "info" | "success"> = {
@@ -27,6 +28,7 @@ export default function AdminChantierDetailPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  const { t } = useI18n();
   const { id } = use(params);
 
   const { data, isLoading, error } = useQuery({
@@ -45,14 +47,14 @@ export default function AdminChantierDetailPage({
           Retour aux chantiers
         </Link>
         {isLoading ? (
-          <h1 className="text-2xl font-bold text-zinc-400">Chargement…</h1>
+          <h1 className="text-2xl font-bold text-zinc-400">{t("common.loading")}</h1>
         ) : error || !data ? (
-          <h1 className="text-2xl font-bold text-red-600">Chantier introuvable</h1>
+          <h1 className="text-2xl font-bold text-red-600">{t("admin.chantierNotFound")}</h1>
         ) : (
           <div>
             <div className="flex flex-wrap items-center gap-2">
               <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{data.name}</h1>
-              <Badge variant={STATUS_VARIANT[data.status]}>{STATUS_LABEL[data.status]}</Badge>
+              <Badge variant={STATUS_VARIANT[data.status]}>{t(STATUS_LABEL_KEYS[data.status])}</Badge>
               {data.archived_at ? (
                 <Badge variant="default">
                   <Archive size={10} className="mr-1" />
@@ -78,7 +80,7 @@ export default function AdminChantierDetailPage({
               <div className="flex items-center gap-3">
                 <Users size={20} className="text-orange-600" />
                 <div>
-                  <p className="text-xs text-zinc-500">Membres</p>
+                  <p className="text-xs text-zinc-500">{t("dashboard.members")}</p>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {data.counts.members}
                   </p>
@@ -89,7 +91,7 @@ export default function AdminChantierDetailPage({
               <div className="flex items-center gap-3">
                 <Camera size={20} className="text-orange-600" />
                 <div>
-                  <p className="text-xs text-zinc-500">Photos</p>
+                  <p className="text-xs text-zinc-500">{t("chantier.tabPhotos")}</p>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {data.counts.photos}
                   </p>
@@ -100,7 +102,7 @@ export default function AdminChantierDetailPage({
               <div className="flex items-center gap-3">
                 <FileText size={20} className="text-orange-600" />
                 <div>
-                  <p className="text-xs text-zinc-500">Documents</p>
+                  <p className="text-xs text-zinc-500">{t("chantier.tabDocuments")}</p>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {data.counts.documents}
                   </p>
@@ -111,7 +113,7 @@ export default function AdminChantierDetailPage({
               <div className="flex items-center gap-3">
                 <ListChecks size={20} className="text-orange-600" />
                 <div>
-                  <p className="text-xs text-zinc-500">Étapes</p>
+                  <p className="text-xs text-zinc-500">{t("admin.steps")}</p>
                   <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {data.counts.steps}
                   </p>
@@ -122,7 +124,7 @@ export default function AdminChantierDetailPage({
 
           {/* Détails */}
           <Card>
-            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">Détails</h2>
+            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">{t("chantier.details")}</h2>
             <dl className="grid grid-cols-1 gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
               <div>
                 <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">
@@ -143,7 +145,7 @@ export default function AdminChantierDetailPage({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Créé par</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("admin.createdBy")}</dt>
                 <dd className="mt-0.5">
                   <Link
                     href={`/admin/users/${data.created_by_id}`}
@@ -155,13 +157,13 @@ export default function AdminChantierDetailPage({
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Créé le</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("chantier.createdOn")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">
                   {formatDateTime(data.created_at)}
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Maj le</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("admin.updatedOn")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">
                   {formatDateTime(data.updated_at)}
                 </dd>
@@ -232,7 +234,7 @@ export default function AdminChantierDetailPage({
                 ))}
               </ul>
             ) : (
-              <p className="p-6 text-sm text-zinc-500">Aucun membre.</p>
+              <p className="p-6 text-sm text-zinc-500">{t("admin.noMember")}</p>
             )}
           </Card>
         </>

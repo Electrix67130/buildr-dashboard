@@ -28,12 +28,14 @@ interface InvitationInfo {
   organization_name: string;
 }
 
-const ROLE_LABELS: Record<string, string> = {
-  admin: "Administrateur",
-  manager: "Chef de chantier",
-  employee: "Ouvrier",
-  client: "Client",
-  gestionnaire_reseau: "Gestionnaire réseau",
+// Cles i18n plutot que libelles : la page d'invitation est vue par des gens
+// qui n'ont pas encore de compte, donc pas encore de langue enregistree.
+const ROLE_LABEL_KEYS: Record<string, string> = {
+  admin: "role.adminLong",
+  manager: "role.managerLong",
+  employee: "role.ouvrier",
+  client: "role.client",
+  gestionnaire_reseau: "role.gestionnaireReseau",
 };
 
 export default function InvitePage() {
@@ -131,7 +133,7 @@ export default function InvitePage() {
         <div className="mt-2 flex justify-between gap-4">
           <span className="text-zinc-500">{t("invite.role")}</span>
           <span className="font-medium text-zinc-900 dark:text-white">
-            {ROLE_LABELS[data.role] ?? data.role}
+            {ROLE_LABEL_KEYS[data.role] ? t(ROLE_LABEL_KEYS[data.role]) : data.role}
           </span>
         </div>
       </div>

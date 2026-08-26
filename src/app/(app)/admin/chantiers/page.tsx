@@ -10,11 +10,12 @@ import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import { adminApi, type ChantierStatus, type ChantierFilters } from "@/lib/admin-api";
 import { formatDate } from "@/lib/utils";
+import { useI18n } from "@/contexts/I18nContext";
 
-const STATUS_LABEL: Record<ChantierStatus, string> = {
-  a_venir: "À venir",
-  en_cours: "En cours",
-  termine: "Terminé",
+const STATUS_LABEL_KEYS: Record<ChantierStatus, string> = {
+  a_venir: "chantiers.statusUpcoming",
+  en_cours: "chantiers.statusInProgress",
+  termine: "chantiers.statusCompleted",
 };
 
 const STATUS_VARIANT: Record<ChantierStatus, "default" | "info" | "success"> = {
@@ -24,6 +25,7 @@ const STATUS_VARIANT: Record<ChantierStatus, "default" | "info" | "success"> = {
 };
 
 export default function AdminChantiersPage() {
+  const { t } = useI18n();
   const [search, setSearch] = useState("");
   const [orgId, setOrgId] = useState("");
   const [userId, setUserId] = useState("");
@@ -63,7 +65,7 @@ export default function AdminChantiersPage() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Chantiers</h1>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("nav.chantiers")}</h1>
         <p className="text-sm text-zinc-500">
           {data?.meta.total ?? 0} chantier{(data?.meta.total ?? 0) > 1 ? "s" : ""}
         </p>
@@ -78,7 +80,7 @@ export default function AdminChantiersPage() {
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
             />
             <Input
-              placeholder="Rechercher (nom, adresse, ville)…"
+              placeholder={t("admin.searchChantier")}
               inputClassName="pl-9"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -86,11 +88,11 @@ export default function AdminChantiersPage() {
           </div>
 
           <Select
-            label="Organisation"
+            label={t("topbar.organization")}
             value={orgId}
             onChange={(e) => setOrgId(e.target.value)}
           >
-            <option value="">Toutes les organisations</option>
+            <option value="">{t("admin.filterAllOrgs")}</option>
             {orgsList.data?.data.map((o) => (
               <option key={o.id} value={o.id}>
                 {o.name}
@@ -98,8 +100,8 @@ export default function AdminChantiersPage() {
             ))}
           </Select>
 
-          <Select label="Membre" value={userId} onChange={(e) => setUserId(e.target.value)}>
-            <option value="">Tous les utilisateurs</option>
+          <Select label={t("admin.filterMember")} value={userId} onChange={(e) => setUserId(e.target.value)}>
+            <option value="">{t("admin.filterAllUsers")}</option>
             {usersList.data?.data.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.first_name} {u.last_name} — {u.email}
@@ -108,28 +110,28 @@ export default function AdminChantiersPage() {
           </Select>
 
           <Select
-            label="Statut"
+            label={t("chantiers.form.status")}
             value={status}
             onChange={(e) => setStatus(e.target.value as ChantierStatus | "")}
           >
-            <option value="">Tous les statuts</option>
-            <option value="a_venir">À venir</option>
-            <option value="en_cours">En cours</option>
-            <option value="termine">Terminé</option>
+            <option value="">{t("admin.filterAllStatuses")}</option>
+            <option value="a_venir">{t("chantiers.statusUpcoming")}</option>
+            <option value="en_cours">{t("chantiers.statusInProgress")}</option>
+            <option value="termine">{t("chantiers.statusCompleted")}</option>
           </Select>
 
           <Select
-            label="Archivage"
+            label={t("admin.filterArchiving")}
             value={archived}
             onChange={(e) => setArchived(e.target.value as typeof archived)}
           >
-            <option value="false">Actifs</option>
-            <option value="true">Archivés</option>
-            <option value="all">Tous</option>
+            <option value="false">{t("admin.filterActive")}</option>
+            <option value="true">{t("admin.filterArchived")}</option>
+            <option value="all">{t("common.all")}</option>
           </Select>
 
           <Select
-            label="Tri"
+            label={t("admin.sortLabel")}
             value={`${sort}:${order}`}
             onChange={(e) => {
               const [s, o] = e.target.value.split(":");
@@ -137,11 +139,11 @@ export default function AdminChantiersPage() {
               setOrder(o as typeof order);
             }}
           >
-            <option value="created_at:desc">Plus récents</option>
-            <option value="created_at:asc">Plus anciens</option>
-            <option value="name:asc">Nom (A→Z)</option>
-            <option value="name:desc">Nom (Z→A)</option>
-            <option value="status:asc">Statut</option>
+            <option value="created_at:desc">{t("admin.sortRecent")}</option>
+            <option value="created_at:asc">{t("admin.sortOldest")}</option>
+            <option value="name:asc">{t("admin.sortNameAsc")}</option>
+            <option value="name:desc">{t("admin.sortNameDesc")}</option>
+            <option value="status:asc">{t("chantiers.form.status")}</option>
           </Select>
 
           <div className="flex items-end">
@@ -166,7 +168,7 @@ export default function AdminChantiersPage() {
 
       <Card className="p-0">
         {isLoading ? (
-          <p className="p-6 text-sm text-zinc-500">Chargement…</p>
+          <p className="p-6 text-sm text-zinc-500">{t("common.loading")}</p>
         ) : data && data.data.length > 0 ? (
           <ul className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {data.data.map((c) => (
@@ -178,7 +180,7 @@ export default function AdminChantiersPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate font-medium text-zinc-900 dark:text-white">{c.name}</p>
-                      <Badge variant={STATUS_VARIANT[c.status]}>{STATUS_LABEL[c.status]}</Badge>
+                      <Badge variant={STATUS_VARIANT[c.status]}>{t(STATUS_LABEL_KEYS[c.status])}</Badge>
                       {c.archived_at ? (
                         <Badge variant="default">
                           <Archive size={10} className="mr-1" />
@@ -203,7 +205,7 @@ export default function AdminChantiersPage() {
             ))}
           </ul>
         ) : (
-          <p className="p-6 text-sm text-zinc-500">Aucun chantier ne correspond aux filtres.</p>
+          <p className="p-6 text-sm text-zinc-500">{t("admin.noChantierMatch")}</p>
         )}
       </Card>
     </div>

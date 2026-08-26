@@ -14,6 +14,7 @@ import { adminApi } from "@/lib/admin-api";
 import { formatDate } from "@/lib/utils";
 import { setTokens } from "@/lib/api";
 import { useConfirm } from "@/contexts/DialogContext";
+import { useI18n } from "@/contexts/I18nContext";
 
 interface OrgDetail {
   id: string;
@@ -40,6 +41,7 @@ interface OrgDetail {
 }
 
 export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { t } = useI18n();
   const { id } = use(params);
   const router = useRouter();
   const qc = useQueryClient();
@@ -55,14 +57,14 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
   const enable = useMutation({
     mutationFn: () => adminApi.enableOrg(id),
     onSuccess: () => {
-      toast.success("Organisation réactivée");
+      toast.success(t("admin.orgReactivated"));
       invalidate();
     },
   });
   const disable = useMutation({
     mutationFn: () => adminApi.disableOrg(id),
     onSuccess: () => {
-      toast.success("Organisation désactivée");
+      toast.success(t("admin.orgDeactivated"));
       invalidate();
     },
   });
@@ -70,10 +72,10 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
     mutationFn: () => adminApi.impersonate(id),
     onSuccess: (data) => {
       setTokens(data.access_token, "");
-      toast.success("Connecté en tant qu'admin de l'orga (30 min)");
+      toast.success(t("admin.loggedInAsOrgAdmin"));
       router.replace("/dashboard");
     },
-    onError: () => toast.error("Aucun admin dans cette orga"),
+    onError: () => toast.error(t("admin.noAdminInOrg")),
   });
 
   return (
@@ -87,13 +89,13 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
           Retour aux organisations
         </Link>
         {isLoading ? (
-          <h1 className="text-2xl font-bold text-zinc-400">Chargement…</h1>
+          <h1 className="text-2xl font-bold text-zinc-400">{t("common.loading")}</h1>
         ) : error || !data ? (
-          <h1 className="text-2xl font-bold text-red-600">Organisation introuvable</h1>
+          <h1 className="text-2xl font-bold text-red-600">{t("admin.orgNotFound")}</h1>
         ) : (
           <div className="flex flex-wrap items-center gap-3">
             <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{data.name}</h1>
-            {!data.is_active ? <Badge variant="danger">Désactivée</Badge> : null}
+            {!data.is_active ? <Badge variant="danger">{t("admin.orgDeactivatedBadge")}</Badge> : null}
           </div>
         )}
       </div>
@@ -111,8 +113,8 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
                 onClick={async () => {
                   const ok = await confirm({
                     title: `Désactiver ${data.name}`,
-                    description: `Désactiver "${data.name}" ?`,
-                    confirmLabel: "Désactiver",
+                    description: t("admin.confirmDisableOrg", { name: data.name }),
+                    confirmLabel: t("admin.deactivate"),
                     tone: "danger",
                   });
                   if (ok) disable.mutate();
@@ -130,10 +132,10 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
           </div>
 
           <Card>
-            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">Détails</h2>
+            <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">{t("chantier.details")}</h2>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Créée le</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("admin.createdOnF")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{formatDate(data.created_at)}</dd>
               </div>
               <div>
@@ -145,11 +147,11 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
                 </dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Membres</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("dashboard.members")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{data.members.length}</dd>
               </div>
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Chantiers</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("nav.chantiers")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{data.chantiers.length}</dd>
               </div>
             </dl>
@@ -175,7 +177,7 @@ export default function AdminOrgDetailPage({ params }: { params: Promise<{ id: s
                     <p className="truncate text-xs text-zinc-500">{m.email}</p>
                   </div>
                   <Badge variant={m.role === "admin" ? "info" : "default"}>{m.role}</Badge>
-                  {!m.is_active ? <Badge variant="danger">Désactivé</Badge> : null}
+                  {!m.is_active ? <Badge variant="danger">{t("admin.userDeactivatedBadge")}</Badge> : null}
                 </li>
               ))}
             </ul>

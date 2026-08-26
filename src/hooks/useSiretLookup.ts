@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useI18n } from "@/contexts/I18nContext";
 
 /**
  * Données utilisables pour pré-remplir le formulaire orga, extraites de
@@ -80,6 +81,7 @@ function buildStreet(e: ApiSiege | ApiMatchingEtab | undefined): string | null {
 }
 
 export function useSiretLookup() {
+  const { t } = useI18n();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -117,7 +119,7 @@ export function useSiretLookup() {
         vat_number: computeFrVat(siren),
       };
     } catch {
-      setError("Erreur réseau lors de la recherche.");
+      setError(t("siret.networkError"));
       return null;
     } finally {
       setIsLoading(false);
