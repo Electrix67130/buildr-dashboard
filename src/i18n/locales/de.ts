@@ -477,6 +477,9 @@ const de: Dict = {
   "admin.confirmForceReset": "Passwort-Zurücksetzung für {email} erzwingen?",
   "admin.confirmKickSessions": "Alle aktiven Sitzungen von {email} beenden?",
   "admin.confirmDeleteUser": "{email} ENDGÜLTIG LÖSCHEN?\n\nUnumkehrbar. DSGVO-konform.",
+  "invite.errorTitle": "Einladung kann nicht geprüft werden",
+  "invite.errorBody": "Der Dienst ist vorübergehend nicht erreichbar. Ihr Link ist nicht das Problem: bitte gleich erneut versuchen.",
+  "common.retry": "Erneut versuchen",
 };
 
 export default de;

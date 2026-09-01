@@ -477,6 +477,9 @@ const it: Dict = {
   "admin.confirmForceReset": "Forzare la reimpostazione della password per {email}?",
   "admin.confirmKickSessions": "Chiudere tutte le sessioni attive di {email}?",
   "admin.confirmDeleteUser": "ELIMINARE DEFINITIVAMENTE {email}?\n\nIrreversibile. Conforme al GDPR.",
+  "invite.errorTitle": "Impossibile verificare l'invito",
+  "invite.errorBody": "Il servizio è temporaneamente irraggiungibile. Il tuo link non è in causa: riprova tra poco.",
+  "common.retry": "Riprova",
 };
 
 export default it;

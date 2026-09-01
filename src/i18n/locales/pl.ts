@@ -477,6 +477,9 @@ const pl: Dict = {
   "admin.confirmForceReset": "Wymusić reset hasła dla {email}?",
   "admin.confirmKickSessions": "Zakończyć wszystkie aktywne sesje {email}?",
   "admin.confirmDeleteUser": "TRWALE USUNĄĆ {email}?\n\nNieodwracalne. Zgodne z RODO.",
+  "invite.errorTitle": "Nie można zweryfikować zaproszenia",
+  "invite.errorBody": "Usługa jest chwilowo niedostępna. Twój link jest w porządku: spróbuj ponownie za chwilę.",
+  "common.retry": "Spróbuj ponownie",
 };
 
 export default pl;

@@ -479,6 +479,9 @@ const en: Dict = {
   "admin.confirmForceReset": "Force a password reset for {email}?",
   "admin.confirmKickSessions": "End all active sessions for {email}?",
   "admin.confirmDeleteUser": "PERMANENTLY DELETE {email}?\n\nIrreversible. GDPR-compliant.",
+  "invite.errorTitle": "Unable to check the invitation",
+  "invite.errorBody": "The service is temporarily unreachable. Your link is not at fault: please try again in a moment.",
+  "common.retry": "Try again",
 };
 
 export default en;

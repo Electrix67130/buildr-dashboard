@@ -48,7 +48,7 @@ export default function InvitePage() {
   const [form, setForm] = useState({ first_name: "", last_name: "", phone: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
 
-  const { data, isLoading, error } = useQuery<InvitationInfo, ApiError>({
+  const { data, isLoading, error, refetch, isFetching } = useQuery<InvitationInfo, ApiError>({
     queryKey: ["invitation", token],
     queryFn: () => apiFetch<InvitationInfo>(`/invitations/by-token/${token}`, { skipAuth: true }),
     enabled: !!token,
@@ -99,20 +99,41 @@ export default function InvitePage() {
   }
 
   if (error || !data) {
-    // 400 = expiree, 404 = introuvable ou deja acceptee. La distinction compte
-    // pour l'invite : dans un cas il redemande un lien, dans l'autre il se
-    // connecte simplement.
-    const expired = error?.statusCode === 400;
+    // Trois cas distincts, et les confondre envoie l'invite sur une fausse piste.
+    //   400 → le lien a expire : il doit en redemander un.
+    //   404 → le lien est inconnu ou deja utilise : il se connecte simplement.
+    //   le reste (403, 5xx, reseau coupe) → le lien n'est pas en cause. Lui dire
+    //   « ce lien est invalide » serait faux, et il abandonnerait un lien
+    //   parfaitement valable au lieu de reessayer.
+    const status = error?.statusCode;
+    const expired = status === 400;
+    const invalid = status === 404 || (!error && !data);
+    const unreachable = !expired && !invalid;
+
+    const title = expired
+      ? t("invite.expiredTitle")
+      : invalid
+        ? t("invite.invalidTitle")
+        : t("invite.errorTitle");
+    const body = expired
+      ? t("invite.expiredBody")
+      : invalid
+        ? t("invite.invalidBody")
+        : t("invite.errorBody");
+
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">
-          {expired ? t("invite.expiredTitle") : t("invite.invalidTitle")}
-        </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {expired ? t("invite.expiredBody") : t("invite.invalidBody")}
-        </p>
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{title}</h1>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">{body}</p>
+        {unreachable ? (
+          <Button className="w-full" onClick={() => refetch()} loading={isFetching}>
+            {t("common.retry")}
+          </Button>
+        ) : null}
         <Link href="/login">
-          <Button className="w-full">{t("auth.signIn")}</Button>
+          <Button variant={unreachable ? "secondary" : "primary"} className="w-full">
+            {t("auth.signIn")}
+          </Button>
         </Link>
       </div>
     );

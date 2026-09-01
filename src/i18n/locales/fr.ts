@@ -477,6 +477,9 @@ const fr: Dict = {
   "admin.confirmForceReset": "Forcer la réinitialisation du mot de passe pour {email} ?",
   "admin.confirmKickSessions": "Tuer toutes les sessions actives de {email} ?",
   "admin.confirmDeleteUser": "SUPPRIMER DÉFINITIVEMENT {email} ?\n\nIrréversible. Conforme au RGPD.",
+  "invite.errorTitle": "Impossible de vérifier l'invitation",
+  "invite.errorBody": "Le service est momentanément injoignable. Votre lien n'est pas en cause : réessayez dans un instant.",
+  "common.retry": "Réessayer",
 };
 
 export default fr;

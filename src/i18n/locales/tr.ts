@@ -477,6 +477,9 @@ const tr: Dict = {
   "admin.confirmForceReset": "{email} için şifre sıfırlama zorunlu kılınsın mı?",
   "admin.confirmKickSessions": "{email} kullanıcısının tüm etkin oturumları kapatılsın mı?",
   "admin.confirmDeleteUser": "{email} KALICI OLARAK SİLİNSİN Mİ?\n\nGeri alınamaz. GDPR uyumlu.",
+  "invite.errorTitle": "Davet doğrulanamıyor",
+  "invite.errorBody": "Hizmete geçici olarak ulaşılamıyor. Bağlantınızda sorun yok: birazdan tekrar deneyin.",
+  "common.retry": "Tekrar dene",
 };
 
 export default tr;
