@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Providers from "@/app/providers";
+import LanguageSwitch from "@/components/LanguageSwitch";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,6 +15,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           </Link>
           <div className="rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
             {children}
+          </div>
+          {/* Sous la carte plutot que dedans : le selecteur vaut pour tous les
+              ecrans d'authentification et ne doit pas s'inserer au milieu d'un
+              formulaire. */}
+          <div className="mt-6 flex justify-center">
+            <LanguageSwitch />
           </div>
         </div>
       </div>
