@@ -483,6 +483,14 @@ const pt: Dict = {
   "auth.signUpWorkerNotice": "É trabalhador, chefe de obra ou prestador? Não precisa de criar uma organização: peça ao administrador da sua empresa que o convide por email.",
   "team.inviteLanguage": "Idioma do email",
   "team.inviteLanguageHint": "O idioma no qual a pessoa receberá o convite.",
+  "auth.resetTitle": "Nova palavra-passe",
+  "auth.resetSubtitle": "Escolha uma palavra-passe para a sua conta Buildr.",
+  "auth.confirmPassword": "Confirmar a palavra-passe",
+  "auth.passwordsMismatch": "As palavras-passe não coincidem.",
+  "auth.resetSubmit": "Repor",
+  "auth.resetDone": "Palavra-passe alterada",
+  "auth.resetDoneBody": "Já pode iniciar sessão com a sua nova palavra-passe.",
+  "auth.resetExpired": "Este link expirou ou já foi utilizado. Peça um novo na página de início de sessão.",
 };
 
 export default pt;

@@ -483,6 +483,14 @@ const pl: Dict = {
   "auth.signUpWorkerNotice": "Jesteś pracownikiem, kierownikiem budowy lub podwykonawcą? Nie musisz tworzyć organizacji: poproś administratora swojej firmy o zaproszenie e-mailem.",
   "team.inviteLanguage": "Język e-maila",
   "team.inviteLanguageHint": "Język, w którym osoba otrzyma zaproszenie.",
+  "auth.resetTitle": "Nowe hasło",
+  "auth.resetSubtitle": "Wybierz hasło do swojego konta Buildr.",
+  "auth.confirmPassword": "Potwierdź hasło",
+  "auth.passwordsMismatch": "Hasła nie są zgodne.",
+  "auth.resetSubmit": "Zresetuj",
+  "auth.resetDone": "Hasło zmienione",
+  "auth.resetDoneBody": "Możesz teraz zalogować się nowym hasłem.",
+  "auth.resetExpired": "Ten link wygasł lub został już użyty. Poproś o nowy na stronie logowania.",
 };
 
 export default pl;

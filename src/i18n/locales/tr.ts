@@ -483,6 +483,14 @@ const tr: Dict = {
   "auth.signUpWorkerNotice": "Çalışan, şantiye şefi veya taşeron musunuz? Organizasyon oluşturmanıza gerek yok: şirketinizin yöneticisinden sizi e-posta ile davet etmesini isteyin.",
   "team.inviteLanguage": "E-posta dili",
   "team.inviteLanguageHint": "Kişinin davetini alacağı dil.",
+  "auth.resetTitle": "Yeni şifre",
+  "auth.resetSubtitle": "Buildr hesabınız için bir şifre seçin.",
+  "auth.confirmPassword": "Şifreyi onayla",
+  "auth.passwordsMismatch": "Şifreler eşleşmiyor.",
+  "auth.resetSubmit": "Sıfırla",
+  "auth.resetDone": "Şifre değiştirildi",
+  "auth.resetDoneBody": "Artık yeni şifrenizle giriş yapabilirsiniz.",
+  "auth.resetExpired": "Bu bağlantının süresi doldu veya zaten kullanıldı. Giriş sayfasından yenisini isteyin.",
 };
 
 export default tr;

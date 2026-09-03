@@ -483,6 +483,14 @@ const fr: Dict = {
   "auth.signUpWorkerNotice": "Vous êtes ouvrier, chef de chantier ou intervenant ? Vous n'avez pas à créer d'organisation : demandez à l'administrateur de votre entreprise de vous inviter par e-mail.",
   "team.inviteLanguage": "Langue du mail",
   "team.inviteLanguageHint": "C'est la langue dans laquelle la personne recevra son invitation.",
+  "auth.resetTitle": "Nouveau mot de passe",
+  "auth.resetSubtitle": "Choisissez un mot de passe pour votre compte Buildr.",
+  "auth.confirmPassword": "Confirmer le mot de passe",
+  "auth.passwordsMismatch": "Les mots de passe ne correspondent pas.",
+  "auth.resetSubmit": "Réinitialiser",
+  "auth.resetDone": "Mot de passe modifié",
+  "auth.resetDoneBody": "Vous pouvez maintenant vous connecter avec votre nouveau mot de passe.",
+  "auth.resetExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau depuis la page de connexion.",
 };
 
 export default fr;

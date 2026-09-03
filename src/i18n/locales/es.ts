@@ -483,6 +483,14 @@ const es: Dict = {
   "auth.signUpWorkerNotice": "¿Es usted operario, jefe de obra o proveedor? No necesita crear una organización: pida al administrador de su empresa que le invite por email.",
   "team.inviteLanguage": "Idioma del email",
   "team.inviteLanguageHint": "El idioma en el que la persona recibirá su invitación.",
+  "auth.resetTitle": "Nueva contraseña",
+  "auth.resetSubtitle": "Elija una contraseña para su cuenta Buildr.",
+  "auth.confirmPassword": "Confirmar la contraseña",
+  "auth.passwordsMismatch": "Las contraseñas no coinciden.",
+  "auth.resetSubmit": "Restablecer",
+  "auth.resetDone": "Contraseña cambiada",
+  "auth.resetDoneBody": "Ya puede iniciar sesión con su nueva contraseña.",
+  "auth.resetExpired": "Este enlace ha caducado o ya se ha utilizado. Solicite uno nuevo desde la página de inicio de sesión.",
 };
 
 export default es;
