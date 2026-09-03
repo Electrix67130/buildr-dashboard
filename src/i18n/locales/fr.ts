@@ -58,7 +58,7 @@ const fr: Dict = {
   "auth.phone": "Téléphone",
   "auth.accountSection": "Votre compte",
   "auth.companySection": "Votre entreprise",
-  "auth.companySectionHint": "Renseigne les informations légales pour faciliter la facturation et les documents officiels. Tu peux les compléter plus tard.",
+  "auth.companySectionHint": "Renseignez les informations légales pour faciliter la facturation et les documents officiels. Vous pourrez les compléter plus tard.",
   "auth.forgotPassword": "Mot de passe oublié ?",
   "auth.noAccount": "Pas encore de compte ?",
   "auth.haveAccount": "Déjà un compte ?",
@@ -480,6 +480,7 @@ const fr: Dict = {
   "invite.errorTitle": "Impossible de vérifier l'invitation",
   "invite.errorBody": "Le service est momentanément injoignable. Votre lien n'est pas en cause : réessayez dans un instant.",
   "common.retry": "Réessayer",
+  "auth.signUpWorkerNotice": "Vous êtes ouvrier, chef de chantier ou intervenant ? Vous n'avez pas à créer d'organisation : demandez à l'administrateur de votre entreprise de vous inviter par e-mail.",
 };
 
 export default fr;

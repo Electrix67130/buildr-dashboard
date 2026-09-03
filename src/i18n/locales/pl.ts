@@ -480,6 +480,7 @@ const pl: Dict = {
   "invite.errorTitle": "Nie można zweryfikować zaproszenia",
   "invite.errorBody": "Usługa jest chwilowo niedostępna. Twój link jest w porządku: spróbuj ponownie za chwilę.",
   "common.retry": "Spróbuj ponownie",
+  "auth.signUpWorkerNotice": "Jesteś pracownikiem, kierownikiem budowy lub podwykonawcą? Nie musisz tworzyć organizacji: poproś administratora swojej firmy o zaproszenie e-mailem.",
 };
 
 export default pl;

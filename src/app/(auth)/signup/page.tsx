@@ -66,7 +66,16 @@ export default function SignupPage() {
   return (
     <>
       <h1 className="mb-1 text-2xl font-bold text-zinc-900 dark:text-white">{t("auth.signUpTitle")}</h1>
-      <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{t("auth.signUpSubtitle")}</p>
+      <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">{t("auth.signUpSubtitle")}</p>
+
+      {/* Un ouvrier arrivant ici n'a rien a y faire : son compte se cree par
+          invitation. Sans ce rappel, il remplissait le formulaire et creait une
+          organisation parasite, ou renoncait faute de comprendre. */}
+      <div className="mb-6 rounded-lg border border-orange-200 bg-orange-50 p-3 dark:border-orange-900/40 dark:bg-orange-900/15">
+        <p className="text-sm text-orange-900 dark:text-orange-200">
+          {t("auth.signUpWorkerNotice")}
+        </p>
+      </div>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-8">
         <section className="flex flex-col gap-4">

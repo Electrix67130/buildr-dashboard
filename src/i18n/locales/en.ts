@@ -482,6 +482,7 @@ const en: Dict = {
   "invite.errorTitle": "Unable to check the invitation",
   "invite.errorBody": "The service is temporarily unreachable. Your link is not at fault: please try again in a moment.",
   "common.retry": "Try again",
+  "auth.signUpWorkerNotice": "Are you a worker, site manager or contractor? You do not need to create an organisation: ask your company administrator to invite you by email.",
 };
 
 export default en;

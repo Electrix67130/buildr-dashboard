@@ -480,6 +480,7 @@ const tr: Dict = {
   "invite.errorTitle": "Davet doğrulanamıyor",
   "invite.errorBody": "Hizmete geçici olarak ulaşılamıyor. Bağlantınızda sorun yok: birazdan tekrar deneyin.",
   "common.retry": "Tekrar dene",
+  "auth.signUpWorkerNotice": "Çalışan, şantiye şefi veya taşeron musunuz? Organizasyon oluşturmanıza gerek yok: şirketinizin yöneticisinden sizi e-posta ile davet etmesini isteyin.",
 };
 
 export default tr;

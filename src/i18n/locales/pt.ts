@@ -480,6 +480,7 @@ const pt: Dict = {
   "invite.errorTitle": "Não foi possível verificar o convite",
   "invite.errorBody": "O serviço está temporariamente indisponível. O seu link não está em causa: tente novamente daqui a pouco.",
   "common.retry": "Tentar novamente",
+  "auth.signUpWorkerNotice": "É trabalhador, chefe de obra ou prestador? Não precisa de criar uma organização: peça ao administrador da sua empresa que o convide por email.",
 };
 
 export default pt;

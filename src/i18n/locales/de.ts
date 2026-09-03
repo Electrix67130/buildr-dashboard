@@ -480,6 +480,7 @@ const de: Dict = {
   "invite.errorTitle": "Einladung kann nicht geprüft werden",
   "invite.errorBody": "Der Dienst ist vorübergehend nicht erreichbar. Ihr Link ist nicht das Problem: bitte gleich erneut versuchen.",
   "common.retry": "Erneut versuchen",
+  "auth.signUpWorkerNotice": "Sind Sie Mitarbeiter, Bauleiter oder Auftragnehmer? Sie müssen keine Organisation erstellen: bitten Sie den Administrator Ihres Unternehmens, Sie per E-Mail einzuladen.",
 };
 
 export default de;
