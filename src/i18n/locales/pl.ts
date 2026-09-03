@@ -481,6 +481,8 @@ const pl: Dict = {
   "invite.errorBody": "Usługa jest chwilowo niedostępna. Twój link jest w porządku: spróbuj ponownie za chwilę.",
   "common.retry": "Spróbuj ponownie",
   "auth.signUpWorkerNotice": "Jesteś pracownikiem, kierownikiem budowy lub podwykonawcą? Nie musisz tworzyć organizacji: poproś administratora swojej firmy o zaproszenie e-mailem.",
+  "team.inviteLanguage": "Język e-maila",
+  "team.inviteLanguageHint": "Język, w którym osoba otrzyma zaproszenie.",
 };
 
 export default pl;

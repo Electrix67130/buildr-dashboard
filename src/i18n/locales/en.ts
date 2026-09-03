@@ -483,6 +483,8 @@ const en: Dict = {
   "invite.errorBody": "The service is temporarily unreachable. Your link is not at fault: please try again in a moment.",
   "common.retry": "Try again",
   "auth.signUpWorkerNotice": "Are you a worker, site manager or contractor? You do not need to create an organisation: ask your company administrator to invite you by email.",
+  "team.inviteLanguage": "Email language",
+  "team.inviteLanguageHint": "The language in which the person will receive their invitation.",
 };
 
 export default en;

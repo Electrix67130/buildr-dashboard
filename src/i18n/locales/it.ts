@@ -481,6 +481,8 @@ const it: Dict = {
   "invite.errorBody": "Il servizio è temporaneamente irraggiungibile. Il tuo link non è in causa: riprova tra poco.",
   "common.retry": "Riprova",
   "auth.signUpWorkerNotice": "È operaio, capocantiere o fornitore? Non deve creare un'organizzazione: chieda all'amministratore della sua azienda di invitarla via email.",
+  "team.inviteLanguage": "Lingua dell'email",
+  "team.inviteLanguageHint": "La lingua in cui la persona riceverà il suo invito.",
 };
 
 export default it;

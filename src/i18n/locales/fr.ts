@@ -481,6 +481,8 @@ const fr: Dict = {
   "invite.errorBody": "Le service est momentanément injoignable. Votre lien n'est pas en cause : réessayez dans un instant.",
   "common.retry": "Réessayer",
   "auth.signUpWorkerNotice": "Vous êtes ouvrier, chef de chantier ou intervenant ? Vous n'avez pas à créer d'organisation : demandez à l'administrateur de votre entreprise de vous inviter par e-mail.",
+  "team.inviteLanguage": "Langue du mail",
+  "team.inviteLanguageHint": "C'est la langue dans laquelle la personne recevra son invitation.",
 };
 
 export default fr;

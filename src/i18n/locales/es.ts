@@ -481,6 +481,8 @@ const es: Dict = {
   "invite.errorBody": "El servicio no está disponible temporalmente. Tu enlace no es el problema: inténtalo de nuevo en un momento.",
   "common.retry": "Reintentar",
   "auth.signUpWorkerNotice": "¿Es usted operario, jefe de obra o proveedor? No necesita crear una organización: pida al administrador de su empresa que le invite por email.",
+  "team.inviteLanguage": "Idioma del email",
+  "team.inviteLanguageHint": "El idioma en el que la persona recibirá su invitación.",
 };
 
 export default es;

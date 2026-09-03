@@ -481,6 +481,8 @@ const de: Dict = {
   "invite.errorBody": "Der Dienst ist vorübergehend nicht erreichbar. Ihr Link ist nicht das Problem: bitte gleich erneut versuchen.",
   "common.retry": "Erneut versuchen",
   "auth.signUpWorkerNotice": "Sind Sie Mitarbeiter, Bauleiter oder Auftragnehmer? Sie müssen keine Organisation erstellen: bitten Sie den Administrator Ihres Unternehmens, Sie per E-Mail einzuladen.",
+  "team.inviteLanguage": "Sprache der E-Mail",
+  "team.inviteLanguageHint": "Die Sprache, in der die Person ihre Einladung erhält.",
 };
 
 export default de;

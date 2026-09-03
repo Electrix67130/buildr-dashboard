@@ -13,7 +13,7 @@ import { apiFetch, ApiError } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { roleBadgeClass } from "@/lib/role-style";
 import { useAuth } from "@/contexts/AuthContext";
-import { useI18n } from "@/contexts/I18nContext";
+import { useI18n, LOCALES, Locale } from "@/contexts/I18nContext";
 import type { User, Invitation, UserRole, PaginatedResponse } from "@/types/api";
 
 const ROLES: UserRole[] = ["admin", "manager", "employee", "client", "gestionnaire_reseau"];
@@ -153,16 +153,20 @@ export default function TeamPage() {
 
 function InviteForm({ onClose }: { onClose: () => void }) {
   const qc = useQueryClient();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<UserRole>("employee");
+  // Pre-remplie avec la langue de celui qui invite : c'est le cas le plus
+  // frequent, une entreprise francaise invitant des francophones. Modifiable
+  // pour les autres.
+  const [mailLocale, setMailLocale] = useState<Locale>(locale);
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setLoading(true);
     try {
-      await apiFetch("/invitations", { method: "POST", body: { email, role } });
+      await apiFetch("/invitations", { method: "POST", body: { email, role, locale: mailLocale } });
       toast.success(t("team.inviteSent"));
       qc.invalidateQueries({ queryKey: ["invitations"] });
       onClose();
@@ -202,6 +206,23 @@ function InviteForm({ onClose }: { onClose: () => void }) {
               ))}
             </select>
           </div>
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
+            {t("team.inviteLanguage")}
+          </label>
+          <select
+            value={mailLocale}
+            onChange={(e) => setMailLocale(e.target.value as Locale)}
+            className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 sm:max-w-xs"
+          >
+            {LOCALES.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.flag} {l.label}
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-zinc-500">{t("team.inviteLanguageHint")}</p>
         </div>
         <div className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={onClose}>

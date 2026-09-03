@@ -481,6 +481,8 @@ const tr: Dict = {
   "invite.errorBody": "Hizmete geçici olarak ulaşılamıyor. Bağlantınızda sorun yok: birazdan tekrar deneyin.",
   "common.retry": "Tekrar dene",
   "auth.signUpWorkerNotice": "Çalışan, şantiye şefi veya taşeron musunuz? Organizasyon oluşturmanıza gerek yok: şirketinizin yöneticisinden sizi e-posta ile davet etmesini isteyin.",
+  "team.inviteLanguage": "E-posta dili",
+  "team.inviteLanguageHint": "Kişinin davetini alacağı dil.",
 };
 
 export default tr;
