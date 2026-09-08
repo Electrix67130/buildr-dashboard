@@ -32,6 +32,19 @@ Mapping automatique à l'ajout sur un chantier :
 | Paramètres | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Aide et signalements | ✅ | ✅ | ✅ | ✅ | ✅ |
 
+## Équipes
+
+| Action | Règle |
+|---|---|
+| Consulter sa propre équipe | Chef de chantier concerné |
+| Consulter l'équipe d'un chef | Admin de la même organisation |
+| Composer une équipe | Admin, les deux personnes devant être de son organisation |
+| Retirer un rattachement | Admin, le rattachement devant être de son organisation |
+
+Les droits se lisent sur `organization_member.role`, jamais sur la colonne
+vestigiale `user.role` : celle-ci est globale, et être administrateur d'une
+organisation ne donne aucun droit dans une autre.
+
 ## Invitations
 
 | Action | admin | manager | employee | client | gestionnaire_reseau |
