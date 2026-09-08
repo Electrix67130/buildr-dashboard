@@ -18,7 +18,7 @@ import { ApiError } from "@/lib/api";
 export default function SignupPage() {
   const router = useRouter();
   const { signup, isAuthenticated, isLoading: authLoading } = useAuth();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [account, setAccount] = useState({
     first_name: "",
     last_name: "",
@@ -52,6 +52,9 @@ export default function SignupPage() {
       await signup({
         ...account,
         organization: payload,
+        // La langue de l'interface au moment de l'inscription : c'est dans
+        // celle-la que le compte recevra ses e-mails.
+        locale,
       });
       toast.success(t("auth.accountCreated"));
       router.replace("/dashboard");

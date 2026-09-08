@@ -107,7 +107,6 @@ export interface Invitation {
   organization_id: string;
   email: string;
   role: UserRole;
-  token: string;
   invited_by: string;
   expires_at: string;
   accepted_at?: string;

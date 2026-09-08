@@ -30,6 +30,50 @@ Mapping automatique à l'ajout sur un chantier :
 | Templates | ✅ | ✅ | ✅ | ❌ | ❌ |
 | **Abonnement** *(dashboard only)* | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Paramètres | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Aide et signalements | ✅ | ✅ | ✅ | ✅ | ✅ |
+
+## Invitations
+
+| Action | admin | manager | employee | client | gestionnaire_reseau |
+|---|---|---|---|---|---|
+| Lister les invitations en attente | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Inviter un employé ou un client | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Inviter un admin ou un manager | ✅ | ❌ | ❌ | ❌ | ❌ |
+| Annuler une invitation | ✅ | ✅ | ❌ | ❌ | ❌ |
+
+La liste **ne renvoie jamais le `token`**. `POST /auth/register` accepte
+n'importe quel jeton en attente sans authentification, avec le rôle qu'il porte :
+un jeton lisible par un membre ordinaire était une escalade vers administrateur.
+
+## Comptes utilisateur
+
+| Action | Règle |
+|---|---|
+| Voir la fiche d'un utilisateur | Membre de la même organisation, ou soi-même |
+| Modifier un profil | Soi-même, ou un membre de son organisation si admin |
+| Supprimer un compte | Admin, et uniquement dans son organisation |
+| Retirer le rôle admin au dernier administrateur | Refusé (409) |
+
+Une cible d'une autre organisation répond **404**, jamais 403 : répondre
+« interdit » confirmerait que l'identifiant existe.
+
+## Signalements (bugs et suggestions)
+
+| Action | Tous les rôles | Super admin Buildr |
+|---|---|---|
+| Déposer un bug ou une suggestion | ✅ | ✅ |
+| Relire ses propres signalements et les réponses reçues | ✅ | ✅ |
+| Lire les signalements des autres | ❌ | ✅ |
+| Répondre, changer le statut | ❌ | ✅ |
+
+Volontairement **hors de la hiérarchie de l'entreprise** : un administrateur
+d'organisation ne voit pas les signalements de ses collaborateurs. Un
+signalement peut parler d'un collègue, d'un client ou d'une pratique interne —
+il va au support Buildr, pas au patron. Le signalement d'autrui répond `404` et
+non `403`, pour ne pas confirmer son existence.
+
+La console vit dans `/admin/feedback`, le formulaire dans `/support` (onglet
+Profil sur mobile).
 
 ## Chantiers (liste)
 

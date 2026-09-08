@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Building2, Archive, Users, FileText, CreditCard, Settings, ShieldCheck } from "lucide-react";
+import { LayoutDashboard, Building2, Archive, Users, FileText, CreditCard, Settings, ShieldCheck, LifeBuoy, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -17,6 +17,9 @@ const NAV_ALL = [
   { href: "/templates", labelKey: "nav.templates", icon: FileText, key: "templates" as const },
   { href: "/billing", labelKey: "nav.billing", icon: CreditCard, key: "billing" as const },
   { href: "/settings", labelKey: "nav.settings", icon: Settings, key: "settings" as const },
+  // Ouvert a tous les roles : c'est souvent l'ouvrier sur le chantier qui
+  // rencontre le bug, pas l'administrateur au bureau.
+  { href: "/support", labelKey: "nav.support", icon: LifeBuoy, key: "support" as const },
 ];
 
 const SUPER_ADMIN_NAV = [
@@ -24,6 +27,7 @@ const SUPER_ADMIN_NAV = [
   { href: "/admin/orgs", labelKey: "admin.orgs", icon: Building2, key: "admin-orgs" as const },
   { href: "/admin/users", labelKey: "admin.users", icon: Users, key: "admin-users" as const },
   { href: "/admin/audit", labelKey: "admin.audit", icon: FileText, key: "admin-audit" as const },
+  { href: "/admin/feedback", labelKey: "admin.feedback", icon: MessageSquare, key: "admin-feedback" as const },
   { href: "/admin/errors", labelKey: "admin.errors", icon: ShieldCheck, key: "admin-errors" as const },
 ];
 

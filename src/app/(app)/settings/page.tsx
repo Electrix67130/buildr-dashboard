@@ -60,6 +60,23 @@ export default function SettingsPage() {
     }
   }, [user]);
 
+  /**
+   * Choix de la langue.
+   *
+   * Elle est enregistree localement pour l'interface, et sur le compte pour les
+   * e-mails et les notifications — sans quoi le produit repondrait en francais a
+   * quelqu'un qui l'utilise en allemand. L'echec de l'enregistrement distant ne
+   * doit pas empecher l'interface de changer de langue : c'est le geste que
+   * l'utilisateur attend, l'autre est une consequence.
+   */
+  const choisirLangue = (code: Locale) => {
+    setLocale(code);
+    if (!user?.id) return;
+    apiFetch(`/users/${user.id}`, { method: "PATCH", body: { locale: code } }).catch(() => {
+      toast.error(t("common.error"));
+    });
+  };
+
   const updateProfile = useMutation({
     mutationFn: () =>
       apiFetch(`/users/${user?.id}`, {
@@ -499,7 +516,7 @@ export default function SettingsPage() {
                 return (
                   <button
                     key={l.code}
-                    onClick={() => setLocale(l.code as Locale)}
+                    onClick={() => choisirLangue(l.code as Locale)}
                     className={cn(
                       "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
                       active

@@ -39,6 +39,12 @@ interface SignupInput {
   company_name?: string;
   invitation_token?: string;
   organization?: SignupOrgInput;
+  /**
+   * Langue de l'interface au moment de l'inscription. Elle devient celle des
+   * e-mails et des notifications du compte — sans elle, tout nouveau compte
+   * serait francophone par defaut.
+   */
+  locale?: string;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
