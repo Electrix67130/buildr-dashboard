@@ -39,9 +39,11 @@ interface Options {
   enabled: boolean;
   /** Appelé quand le serveur ferme avec code 4001 (session prise par une autre connexion). */
   onSessionReplaced?: () => void;
+  /** Appelé quand le serveur ferme avec le code 4002 : le compte vient d'être désactivé. */
+  onAccountDisabled?: () => void;
 }
 
-export function useRealtimeSync({ enabled, onSessionReplaced }: Options): void {
+export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled }: Options): void {
   const queryClient = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptRef = useRef(0);
@@ -131,6 +133,11 @@ export function useRealtimeSync({ enabled, onSessionReplaced }: Options): void {
         if (e.code === 4001) {
           cancelledRef.current = true;
           onSessionReplaced?.();
+          return;
+        }
+        if (e.code === 4002) {
+          cancelledRef.current = true;
+          onAccountDisabled?.();
           return;
         }
 

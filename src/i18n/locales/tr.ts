@@ -64,6 +64,7 @@ const tr: Dict = {
   "auth.haveAccount": "Zaten hesabınız var mı?",
   "auth.createOrg": "Bir organizasyon oluştur",
   "auth.invalidCredentials": "E-posta veya şifre hatalı.",
+  "auth.accountDisabled": "Bu hesap devre dışı bırakıldı. Lütfen yöneticinizle iletişime geçin.",
   "auth.passwordTooShort": "Şifre en az 8 karakter olmalıdır.",
   "auth.connected": "Giriş yapıldı",
   "auth.accountCreated": "Hesap oluşturuldu",

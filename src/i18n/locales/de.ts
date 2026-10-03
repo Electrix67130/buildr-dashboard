@@ -64,6 +64,7 @@ const de: Dict = {
   "auth.haveAccount": "Bereits ein Konto?",
   "auth.createOrg": "Organisation erstellen",
   "auth.invalidCredentials": "Falsche E-Mail oder Passwort.",
+  "auth.accountDisabled": "Dieses Konto wurde deaktiviert. Bitte wenden Sie sich an Ihren Administrator.",
   "auth.passwordTooShort": "Passwort muss mindestens 8 Zeichen lang sein.",
   "auth.connected": "Angemeldet",
   "auth.accountCreated": "Konto erstellt",

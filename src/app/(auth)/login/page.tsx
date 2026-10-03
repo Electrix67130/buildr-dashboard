@@ -31,7 +31,9 @@ export default function LoginPage() {
       router.replace("/dashboard");
     } catch (err) {
       const msg =
-        err instanceof ApiError && err.statusCode === 401
+        err instanceof ApiError && err.statusCode === 403 && (err.body as { error?: string } | null)?.error === "AccountDisabled"
+          ? t("auth.accountDisabled")
+          : err instanceof ApiError && err.statusCode === 401
           ? t("auth.invalidCredentials")
           : err instanceof Error
             ? err.message

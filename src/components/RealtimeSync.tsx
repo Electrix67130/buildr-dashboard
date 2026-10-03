@@ -24,6 +24,11 @@ export default function RealtimeSync() {
       await logout();
       router.replace("/login");
     },
+    onAccountDisabled: async () => {
+      toast.error(t("auth.accountDisabled"));
+      await logout();
+      router.replace("/login");
+    },
   });
 
   return null;

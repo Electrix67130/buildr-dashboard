@@ -64,6 +64,7 @@ const en: Dict = {
   "auth.haveAccount": "Already have an account?",
   "auth.createOrg": "Create an organization",
   "auth.invalidCredentials": "Wrong email or password.",
+  "auth.accountDisabled": "This account has been deactivated. Please contact your administrator.",
   "auth.passwordTooShort": "Password must be at least 8 characters.",
   "auth.connected": "Signed in",
   "auth.accountCreated": "Account created",
