@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
-import { apiFetch, setTokens, clearTokens, getAccessToken } from "@/lib/api";
+import { apiFetch, setTokens, clearTokens, getAccessToken, ApiError } from "@/lib/api";
 import type { User, AuthResponse } from "@/types/api";
 
 interface AuthContextValue {
@@ -62,9 +62,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const me = await apiFetch<User>("/auth/me");
       setUser(me);
-    } catch {
-      setUser(null);
-      clearTokens();
+    } catch (err) {
+      // Seul un 401 signifie que la session est finie. Une erreur passagere
+      // (API en cours de redeploiement, reseau) ne doit pas effacer les
+      // jetons : on garde ce qu'on a et on reessaiera au prochain chargement.
+      if (err instanceof ApiError && err.statusCode === 401) {
+        setUser(null);
+        clearTokens();
+      }
     } finally {
       setIsLoading(false);
     }

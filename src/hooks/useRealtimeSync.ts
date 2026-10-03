@@ -25,11 +25,12 @@ export type RealtimeEventType =
   | "emergency-comment.deleted"
   | "chantier-member.created"
   | "chantier-member.updated"
-  | "chantier-member.deleted";
+  | "chantier-member.deleted"
+  | "membership.updated";
 
 interface RealtimeEvent {
   type: RealtimeEventType;
-  chantier_id: string;
+  chantier_id?: string;
   resource_id?: string;
   actor_id?: string;
 }
@@ -90,6 +91,11 @@ export function useRealtimeSync({ enabled, onSessionReplaced }: Options): void {
         case "chantier-member.updated":
         case "chantier-member.deleted":
           queryClient.invalidateQueries({ queryKey: ["chantier-members", cid] });
+          queryClient.invalidateQueries({ queryKey: ["chantiers"] });
+          break;
+        case "membership.updated":
+          // Le role conditionne tout ce que l'API renvoie : on relit tout.
+          queryClient.invalidateQueries();
           break;
       }
     };

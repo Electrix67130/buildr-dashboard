@@ -58,9 +58,15 @@ async function refreshAccessToken(): Promise<string> {
         body: JSON.stringify({ refresh_token: refreshToken }),
       });
 
-      if (!response.ok) {
+      // Seul un 401 dit que la session est finie. Un 502 pendant un
+      // redeploiement de l'API ou une erreur passagere ne doivent pas
+      // deconnecter : on garde les jetons et on reessaiera.
+      if (response.status === 401) {
         clearTokens();
         throw new ApiError(401, "Refresh token expired", null);
+      }
+      if (!response.ok) {
+        throw new ApiError(response.status, "Refresh temporarily failed", null);
       }
 
       const data = (await response.json()) as { access_token: string; refresh_token: string };
@@ -116,7 +122,10 @@ export async function apiFetch<T = unknown>(path: string, options: FetchOptions 
         body: body !== undefined ? JSON.stringify(body) : undefined,
       });
       return parseResponse<T>(retried);
-    } catch {
+    } catch (err) {
+      // Deconnexion seulement si le renouvellement a repondu 401. Une erreur
+      // passagere remonte telle quelle a l'appelant.
+      if (!(err instanceof ApiError && err.statusCode === 401)) throw err;
       clearTokens();
       if (isBrowser && !path.startsWith("/auth/")) {
         window.location.href = "/login";
