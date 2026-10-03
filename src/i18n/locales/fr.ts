@@ -65,6 +65,7 @@ const fr: Dict = {
   "auth.createOrg": "Créer une organisation",
   "auth.invalidCredentials": "Email ou mot de passe incorrect.",
   "auth.accountDisabled": "Ce compte est désactivé. Contactez votre administrateur.",
+  "auth.accountDeleted": "Ce compte a été supprimé.",
   "auth.passwordTooShort": "Le mot de passe doit faire au moins 8 caractères.",
   "auth.connected": "Connecté",
   "auth.accountCreated": "Compte créé",

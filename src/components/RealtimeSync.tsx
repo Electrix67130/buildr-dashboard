@@ -29,6 +29,11 @@ export default function RealtimeSync() {
       await logout();
       router.replace("/login");
     },
+    onAccountDeleted: async () => {
+      toast.error(t("auth.accountDeleted"));
+      await logout();
+      router.replace("/login");
+    },
   });
 
   return null;
