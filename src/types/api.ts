@@ -166,6 +166,16 @@ export interface Document {
   created_at: string;
 }
 
+/** Vignette d'une photo qui atteste une etape ou une sous-etape. */
+export interface StepPhoto {
+  id: string;
+  url: string;
+  thumbnail_url: string | null;
+  step_id: string;
+  substep_id: string | null;
+  created_at: string;
+}
+
 export interface ChantierStep {
   id: string;
   chantier_id: string;
@@ -174,6 +184,8 @@ export interface ChantierStep {
   validated_at?: string;
   created_at: string;
   substeps?: ChantierSubstep[];
+  /** Photos de l'etape elle-meme, hors sous-etapes. */
+  photos?: StepPhoto[];
 }
 
 export interface ChantierSubstep {
@@ -184,6 +196,7 @@ export interface ChantierSubstep {
   validated_at?: string | null;
   validated_by?: string | null;
   validation_comment?: string | null;
+  photos?: StepPhoto[];
 }
 
 export interface Emergency {

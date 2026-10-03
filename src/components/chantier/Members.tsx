@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { UserPlus, Trash2, Shield, ChevronDown, ChevronUp, X } from "lucide-react";
+import { UserPlus, Trash2, Shield, ShieldCheck, ChevronDown, ChevronUp, X } from "lucide-react";
 import { toast } from "sonner";
 import Card from "@/components/ui/Card";
 import Avatar from "@/components/ui/Avatar";
@@ -236,7 +236,15 @@ export default function Members({
                     <Badge variant={m.role === "manager" ? "info" : "default"}>
                       {roleLabel(m.role)}
                     </Badge>
-                    {canEditPerms ? (
+                    {m.user_role === "admin" ? (
+                      // Un administrateur a toujours tout : ses drapeaux ne
+                      // sont jamais lus, et l'API refuse de les modifier.
+                      <Badge variant="success" title={t("chantierMembers.adminFullAccessDesc")}>
+                        <ShieldCheck size={12} className="mr-1 inline" />
+                        {t("chantierMembers.adminFullAccess")}
+                      </Badge>
+                    ) : null}
+                    {canEditPerms && m.user_role !== "admin" ? (
                       <button
                         onClick={() => setExpandedId(expanded ? null : m.id)}
                         className={cn(
@@ -272,7 +280,7 @@ export default function Members({
                       </button>
                     ) : null}
                   </div>
-                  {expanded && canEditPerms ? (
+                  {expanded && canEditPerms && m.user_role !== "admin" ? (
                     <div className="border-t border-zinc-100 bg-zinc-50/50 px-6 py-4 dark:border-zinc-800 dark:bg-zinc-900/50">
                       <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-zinc-500">
                         {t("chantierMembers.permissions")}
