@@ -28,7 +28,23 @@ export interface AdminUser {
   phone: string | null;
   is_active: boolean;
   is_super_admin: boolean;
+  deleted_at?: string | null;
   created_at: string;
+  organizations?: { id: string; name: string; role: string }[];
+}
+
+export type AdminUserRole = "admin" | "manager" | "employee" | "client" | "gestionnaire_reseau";
+export type AdminUserStatus = "active" | "disabled" | "deleted";
+
+export interface UserFilters {
+  q?: string;
+  organization_id?: string;
+  role?: AdminUserRole;
+  status?: AdminUserStatus;
+  super_admin?: boolean;
+  sort?: "created_at" | "last_name" | "email";
+  order?: "asc" | "desc";
+  page?: number;
 }
 
 export type ChantierStatus = "a_venir" | "en_cours" | "termine";
@@ -135,10 +151,21 @@ export const adminApi = {
       method: "POST",
     }),
 
-  users: (q?: string, page = 1) =>
-    apiFetch<PaginatedResponse<AdminUser>>(
-      `/super-admin/users?page=${page}${q ? `&q=${encodeURIComponent(q)}` : ""}`,
-    ),
+  users: (filters: UserFilters | string = {}, page = 1) => {
+    // Ancienne signature (q, page) toujours acceptee.
+    const f: UserFilters = typeof filters === "string" ? { q: filters, page } : filters;
+    const params = new URLSearchParams();
+    params.set("page", String(f.page ?? page));
+    params.set("limit", "50");
+    if (f.q) params.set("q", f.q);
+    if (f.organization_id) params.set("organization_id", f.organization_id);
+    if (f.role) params.set("role", f.role);
+    if (f.status) params.set("status", f.status);
+    if (f.super_admin) params.set("super_admin", "1");
+    if (f.sort) params.set("sort", f.sort);
+    if (f.order) params.set("order", f.order);
+    return apiFetch<PaginatedResponse<AdminUser>>(`/super-admin/users?${params.toString()}`);
+  },
   user: (id: string) =>
     apiFetch<AdminUser & { memberships: unknown[]; active_sessions: number }>(`/super-admin/users/${id}`),
   enableUser: (id: string) => apiFetch(`/super-admin/users/${id}/enable`, { method: "POST" }),

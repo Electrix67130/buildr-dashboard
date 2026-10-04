@@ -251,6 +251,7 @@ const tr: Dict = {
   "role.employee": "Çalışan",
   "role.ouvrier": "İşçi",
   "role.client": "Müşteri",
+  "role.gestionnaire_reseau": "Şebeke yöneticisi",
   "role.gestionnaireReseau": "Ağ yöneticisi",
 
   // Archives page
@@ -469,6 +470,14 @@ const tr: Dict = {
   "admin.auditTitle": "Denetim günlüğü",
   "admin.errorsTitle": "Hatalar",
   "admin.searchUser": "Ara (e-posta, ad)…",
+  "admin.filterRole": "Rol",
+  "admin.filterAllRoles": "Tüm roller",
+  "admin.filterAccountState": "Hesap durumu",
+  "admin.filterAllAccounts": "Tüm hesaplar",
+  "admin.filterDisabled": "Devre dışı",
+  "admin.filterDeleted": "Silinmiş",
+  "admin.filterSuperAdmins": "Yalnızca süper yöneticiler",
+  "admin.filterReset": "Filtreleri sıfırla",
   "admin.searchChantier": "Ara (ad, adres, şehir)…",
   "admin.filterMember": "Üye",
   "admin.filterArchiving": "Arşivleme",

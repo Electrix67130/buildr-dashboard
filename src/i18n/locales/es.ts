@@ -251,6 +251,7 @@ const es: Dict = {
   "role.employee": "Empleado",
   "role.ouvrier": "Obrero",
   "role.client": "Cliente",
+  "role.gestionnaire_reseau": "Gestor de red",
   "role.gestionnaireReseau": "Gestor de red",
 
   // Archives page
@@ -469,6 +470,14 @@ const es: Dict = {
   "admin.auditTitle": "Registro de auditoría",
   "admin.errorsTitle": "Errores",
   "admin.searchUser": "Buscar (email, nombre)…",
+  "admin.filterRole": "Rol",
+  "admin.filterAllRoles": "Todos los roles",
+  "admin.filterAccountState": "Estado de la cuenta",
+  "admin.filterAllAccounts": "Todas las cuentas",
+  "admin.filterDisabled": "Desactivados",
+  "admin.filterDeleted": "Eliminados",
+  "admin.filterSuperAdmins": "Solo superadministradores",
+  "admin.filterReset": "Restablecer filtros",
   "admin.searchChantier": "Buscar (nombre, dirección, ciudad)…",
   "admin.filterMember": "Miembro",
   "admin.filterArchiving": "Archivado",

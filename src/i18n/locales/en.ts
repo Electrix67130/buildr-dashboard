@@ -251,6 +251,7 @@ const en: Dict = {
   "role.employee": "Employee",
   "role.ouvrier": "Worker",
   "role.client": "Client",
+  "role.gestionnaire_reseau": "Network manager",
   "role.gestionnaireReseau": "Network manager",
 
   // Archives page
@@ -471,6 +472,14 @@ const en: Dict = {
   "admin.auditTitle": "Audit log",
   "admin.errorsTitle": "Errors",
   "admin.searchUser": "Search (email, name)…",
+  "admin.filterRole": "Role",
+  "admin.filterAllRoles": "All roles",
+  "admin.filterAccountState": "Account state",
+  "admin.filterAllAccounts": "All accounts",
+  "admin.filterDisabled": "Deactivated",
+  "admin.filterDeleted": "Deleted",
+  "admin.filterSuperAdmins": "Super admins only",
+  "admin.filterReset": "Reset filters",
   "admin.searchChantier": "Search (name, address, city)…",
   "admin.filterMember": "Member",
   "admin.filterArchiving": "Archiving",
