@@ -33,10 +33,10 @@ export default function Discussions({
     toast.error(err instanceof ApiError ? err.message : t("common.error"));
 
   const create = useMutation({
-    mutationFn: (content: string) =>
+    mutationFn: ({ content, replyToId }: { content: string; replyToId?: string }) =>
       apiFetch<Comment>("/comments", {
         method: "POST",
-        body: { chantier_id: chantierId, content, step_id: null },
+        body: { chantier_id: chantierId, content, step_id: null, reply_to_id: replyToId ?? null },
       }),
     onSuccess: invalidate,
     onError,
@@ -45,6 +45,13 @@ export default function Discussions({
   const edit = useMutation({
     mutationFn: ({ id, content }: { id: string; content: string }) =>
       apiFetch(`/comments/${id}`, { method: "PATCH", body: { content } }),
+    onSuccess: invalidate,
+    onError,
+  });
+
+  const react = useMutation({
+    mutationFn: ({ id, emoji }: { id: string; emoji: string }) =>
+      apiFetch(`/comments/${id}/reactions`, { method: "POST", body: { emoji } }),
     onSuccess: invalidate,
     onError,
   });
@@ -66,7 +73,8 @@ export default function Discussions({
       canSend={canSend}
       canDeleteOthers={canDeleteOthers}
       placeholder={t("discussions.placeholder")}
-      onSend={(content) => create.mutate(content)}
+      onSend={(content, replyToId) => create.mutate({ content, replyToId })}
+      onReact={(id, emoji) => react.mutate({ id, emoji })}
       onEdit={(id, content) => edit.mutate({ id, content })}
       onDelete={(id) => remove.mutate(id)}
       sending={create.isPending}

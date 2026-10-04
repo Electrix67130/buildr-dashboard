@@ -113,12 +113,31 @@ export interface Invitation {
   created_at: string;
 }
 
+export interface CommentReplyPreview {
+  id: string;
+  content: string;
+  author_id: string;
+  first_name: string;
+  last_name: string;
+}
+
+export interface CommentReaction {
+  emoji: string;
+  count: number;
+  mine: boolean;
+}
+
+export const REACTION_EMOJIS = ["👍", "❤️", "😂", "😮", "😢", "🙏", "🔥"] as const;
+
 export interface Comment {
   id: string;
   chantier_id: string;
   step_id?: string;
   author_id: string;
   content: string;
+  reply_to_id?: string | null;
+  reply_to?: CommentReplyPreview | null;
+  reactions?: CommentReaction[];
   created_at: string;
   updated_at: string;
   first_name: string;

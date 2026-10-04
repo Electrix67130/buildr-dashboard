@@ -1,7 +1,9 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { Send, Pencil, Trash2, Check, X } from "lucide-react";
+import { Send, Pencil, Trash2, Check, X, Reply, SmilePlus } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { REACTION_EMOJIS } from "@/types/api";
 import Avatar from "@/components/ui/Avatar";
 import Button from "@/components/ui/Button";
 import EmptyState from "@/components/ui/EmptyState";
@@ -18,6 +20,10 @@ export interface ThreadMessage {
   first_name: string;
   last_name: string;
   avatar_url?: string;
+  /** Message cite, quand le fil le permet. */
+  reply_to?: { id: string; content: string; author_id: string; first_name: string; last_name: string } | null;
+  /** Reactions agregees, quand le fil le permet. */
+  reactions?: { emoji: string; count: number; mine: boolean }[];
 }
 
 interface Props {
@@ -29,9 +35,12 @@ interface Props {
   placeholder?: string;
   emptyTitle?: string;
   emptyDescription?: string;
-  onSend: (content: string) => void;
+  /** `replyToId` est fourni quand la personne repond a un message precis. */
+  onSend: (content: string, replyToId?: string) => void;
   onEdit: (id: string, content: string) => void;
   onDelete: (id: string) => void;
+  /** Absent : le fil ne propose ni reponse citee ni reaction (urgences). */
+  onReact?: (id: string, emoji: string) => void;
   sending?: boolean;
   /**
    * Considère le message comme "modifié" si updated_at - created_at > 2s
@@ -52,6 +61,7 @@ export default function MessageThread({
   onSend,
   onEdit,
   onDelete,
+  onReact,
   sending = false,
   editedThresholdMs = 2000,
 }: Props) {
@@ -60,6 +70,34 @@ export default function MessageThread({
   const [text, setText] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [replyTo, setReplyTo] = useState<ThreadMessage | null>(null);
+  const [pickerFor, setPickerFor] = useState<string | null>(null);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const interactive = !!onReact;
+
+  const authorName = (m: { author_id: string; first_name: string; last_name: string }) =>
+    m.author_id === currentUserId ? t("common.you") : `${m.first_name} ${m.last_name}`;
+
+  const beginReply = (m: ThreadMessage) => {
+    setReplyTo(m);
+    setPickerFor(null);
+    textareaRef.current?.focus();
+  };
+
+  const jumpTo = (id: string) => {
+    document.getElementById(`message-${id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+    setHighlightedId(id);
+    setTimeout(() => setHighlightedId((cur) => (cur === id ? null : cur)), 1600);
+  };
+
+  const send = () => {
+    const trimmed = text.trim();
+    if (!trimmed) return;
+    onSend(trimmed, replyTo?.id);
+    setText("");
+    setReplyTo(null);
+  };
 
   const beginEdit = (m: ThreadMessage) => {
     setEditingId(m.id);
@@ -81,20 +119,17 @@ export default function MessageThread({
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    onSend(trimmed);
-    setText("");
+    send();
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      const trimmed = text.trim();
-      if (trimmed) {
-        onSend(trimmed);
-        setText("");
-      }
+      send();
+    }
+    if (e.key === "Escape" && replyTo) {
+      e.preventDefault();
+      setReplyTo(null);
     }
   };
 
@@ -103,9 +138,23 @@ export default function MessageThread({
       {canSend ? (
         <form
           onSubmit={onSubmit}
-          className="flex gap-2 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
+          className="flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-3 dark:border-zinc-800 dark:bg-zinc-900"
         >
+          {replyTo ? (
+            <div className="flex items-center gap-2 rounded-lg border-l-2 border-orange-500 bg-zinc-50 px-3 py-1.5 text-xs dark:bg-zinc-800">
+              <Reply size={12} className="text-orange-600" />
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-orange-700 dark:text-orange-300">{t("messages.replyingTo", { name: authorName(replyTo) })}</p>
+                <p className="truncate text-zinc-500">{replyTo.content}</p>
+              </div>
+              <button type="button" onClick={() => setReplyTo(null)} className="rounded p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label={t("common.cancel")}>
+                <X size={12} />
+              </button>
+            </div>
+          ) : null}
+          <div className="flex gap-2">
           <textarea
+            ref={textareaRef}
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={placeholder ?? t("discussions.placeholder")}
@@ -116,6 +165,7 @@ export default function MessageThread({
           <Button type="submit" disabled={!text.trim()} loading={sending}>
             <Send size={16} />
           </Button>
+          </div>
         </form>
       ) : null}
 
@@ -134,10 +184,15 @@ export default function MessageThread({
             const edited =
               new Date(m.updated_at).getTime() - new Date(m.created_at).getTime() >
               editedThresholdMs;
+            const reactions = m.reactions ?? [];
             return (
               <div
                 key={m.id}
-                className="group flex items-start gap-3 rounded-xl border border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-900"
+                id={`message-${m.id}`}
+                className={cn(
+                  "group relative flex items-start gap-3 rounded-xl border bg-white p-4 transition-colors dark:bg-zinc-900",
+                  highlightedId === m.id ? "border-orange-500" : "border-zinc-200 dark:border-zinc-800",
+                )}
               >
                 <Avatar
                   firstName={m.first_name}
@@ -160,6 +215,17 @@ export default function MessageThread({
                     </p>
                   </div>
 
+                  {m.reply_to ? (
+                    <button
+                      type="button"
+                      onClick={() => jumpTo(m.reply_to!.id)}
+                      className="mt-1.5 block w-full rounded-md border-l-2 border-orange-500 bg-zinc-50 px-3 py-1.5 text-left text-xs hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700"
+                    >
+                      <p className="font-semibold text-orange-700 dark:text-orange-300">{authorName(m.reply_to)}</p>
+                      <p className="line-clamp-2 text-zinc-500 dark:text-zinc-400">{m.reply_to.content}</p>
+                    </button>
+                  ) : null}
+
                   {isEditing ? (
                     <EditField
                       value={editText}
@@ -172,10 +238,74 @@ export default function MessageThread({
                       {m.content}
                     </p>
                   )}
+
+                  {reactions.length > 0 ? (
+                    <div className="mt-2 flex flex-wrap gap-1.5">
+                      {reactions.map((r) => (
+                        <button
+                          key={r.emoji}
+                          type="button"
+                          onClick={() => interactive && onReact?.(m.id, r.emoji)}
+                          disabled={!interactive}
+                          className={cn(
+                            "flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs transition-transform hover:scale-105 active:scale-95",
+                            r.mine
+                              ? "border-orange-500 bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300"
+                              : "border-zinc-200 bg-zinc-50 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300",
+                          )}
+                          aria-pressed={r.mine}
+                        >
+                          <span>{r.emoji}</span>
+                          <span className="font-semibold">{r.count}</span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
                 </div>
 
-                {!isEditing && (isOwn || canDeleteOthers) ? (
-                  <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+                {!isEditing && (interactive || isOwn || canDeleteOthers) ? (
+                  <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+                    {interactive ? (
+                      <div className="relative">
+                        <button
+                          onClick={() => setPickerFor(pickerFor === m.id ? null : m.id)}
+                          className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                          aria-label={t("messages.react")}
+                          title={t("messages.react")}
+                        >
+                          <SmilePlus size={14} />
+                        </button>
+                        {pickerFor === m.id ? (
+                          <div className="absolute right-0 top-8 z-10 flex gap-1 rounded-full border border-zinc-200 bg-white px-2 py-1 shadow-lg dark:border-zinc-700 dark:bg-zinc-800">
+                            {REACTION_EMOJIS.map((emoji, i) => (
+                              <button
+                                key={emoji}
+                                type="button"
+                                onClick={() => {
+                                  onReact?.(m.id, emoji);
+                                  setPickerFor(null);
+                                }}
+                                style={{ animationDelay: `${i * 30}ms` }}
+                                className="animate-in zoom-in rounded-full p-1 text-lg transition-transform hover:scale-125"
+                                aria-label={emoji}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : null}
+                    {interactive ? (
+                      <button
+                        onClick={() => beginReply(m)}
+                        className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                        aria-label={t("messages.reply")}
+                        title={t("messages.reply")}
+                      >
+                        <Reply size={14} />
+                      </button>
+                    ) : null}
                     {isOwn ? (
                       <button
                         onClick={() => beginEdit(m)}
