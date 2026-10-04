@@ -218,6 +218,13 @@ export interface ChantierSubstep {
   photos?: StepPhoto[];
 }
 
+export interface EmergencyPhoto {
+  id: string;
+  url: string;
+  thumbnail_url: string | null;
+  created_at: string;
+}
+
 export interface Emergency {
   id: string;
   chantier_id: string;
@@ -228,6 +235,8 @@ export interface Emergency {
   created_by: string;
   created_at: string;
   resolved_at?: string;
+  photo_url?: string | null;
+  photos?: EmergencyPhoto[];
 }
 
 export interface ChantierMember {

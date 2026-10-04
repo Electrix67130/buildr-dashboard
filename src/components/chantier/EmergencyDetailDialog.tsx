@@ -2,7 +2,8 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, X } from "lucide-react";
+import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
 import MessageThread from "@/components/MessageThread";
@@ -31,6 +32,14 @@ export default function EmergencyDetailDialog({
   const { user } = useAuth();
   const { t } = useI18n();
   const queryKey = ["emergency-comments", emergency.id] as const;
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  // Toutes les photos de l'urgence ; les anciennes n'ont que photo_url.
+  const photos =
+    emergency.photos && emergency.photos.length > 0
+      ? emergency.photos
+      : emergency.photo_url
+        ? [{ id: "legacy", url: emergency.photo_url, thumbnail_url: null, created_at: emergency.created_at }]
+        : [];
 
   const list = useQuery({
     queryKey,
@@ -109,8 +118,33 @@ export default function EmergencyDetailDialog({
                 {emergency.description}
               </p>
             ) : null}
+            {photos.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {photos.map((p) => (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => setLightbox(p.url)}
+                    className="h-24 w-24 overflow-hidden rounded-lg border border-zinc-200 transition-opacity hover:opacity-80 dark:border-zinc-700"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={p.thumbnail_url ?? p.url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         </div>
+
+        {lightbox ? (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-4" onClick={() => setLightbox(null)} role="dialog" aria-modal="true">
+            <button onClick={() => setLightbox(null)} className="absolute right-4 top-4 rounded-full bg-white/10 p-2 text-white hover:bg-white/20" aria-label={t("common.close")}>
+              <X size={20} />
+            </button>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={lightbox} alt="" className="max-h-[85vh] max-w-full rounded-lg" onClick={(e) => e.stopPropagation()} />
+          </div>
+        ) : null}
 
         <div>
           <h3 className="mb-2 text-sm font-semibold text-zinc-900 dark:text-white">
