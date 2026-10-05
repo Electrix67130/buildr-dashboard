@@ -80,6 +80,7 @@ export default function Discussions({
   const messages = (list.data?.data ?? []).filter((c) => !c.step_id);
 
   return (
+    <>
     <MessageThread
       messages={messages}
       currentUserId={user?.id}
@@ -95,5 +96,7 @@ export default function Discussions({
       onReport={(msg) => setReportTarget({ type: "comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${msg.content.slice(0, 120)}` })}
       sending={create.isPending}
     />
+    <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />
+    </>
   );
 }

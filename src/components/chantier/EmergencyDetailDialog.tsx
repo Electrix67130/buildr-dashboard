@@ -169,6 +169,7 @@ export default function EmergencyDetailDialog({
           />
         </div>
       </div>
+      <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />
     </Modal>
   );
 }

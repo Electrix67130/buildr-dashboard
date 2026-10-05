@@ -115,6 +115,7 @@ export default function StepDiscussionDialog({
         onReport={(msg) => setReportTarget({ type: "comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${msg.content.slice(0, 120)}` })}
         sending={create.isPending}
       />
+      <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />
     </Modal>
   );
 }
