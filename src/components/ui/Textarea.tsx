@@ -1,4 +1,4 @@
-import { TextareaHTMLAttributes, forwardRef } from "react";
+import { TextareaHTMLAttributes, forwardRef, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -11,7 +11,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textare
   { className, label, error, hint, id, rows = 4, ...rest },
   ref,
 ) {
-  const inputId = id || rest.name;
+  const generatedId = useId();
+  const inputId = id || rest.name || generatedId;
   return (
     <div className="flex flex-col gap-1.5">
       {label ? (

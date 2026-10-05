@@ -1,5 +1,6 @@
 "use client";
 
+import { setFormatLocale } from "@/lib/utils";
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
 import { translate, LOCALES, Locale } from "@/i18n/translations";
 
@@ -49,6 +50,10 @@ export function I18nProvider({ children }: { children: ReactNode }) {
     (key: string, vars?: Record<string, string | number>) => translate(locale, key, vars),
     [locale],
   );
+
+  useEffect(() => {
+    setFormatLocale(locale);
+  }, [locale]);
 
   return <I18nContext.Provider value={{ locale, setLocale, t }}>{children}</I18nContext.Provider>;
 }

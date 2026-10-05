@@ -168,7 +168,7 @@ export default function MessageThread({
             className="min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:text-zinc-100"
             onKeyDown={onKeyDown}
           />
-          <Button type="submit" disabled={!text.trim()} loading={sending}>
+          <Button type="submit" disabled={!text.trim()} loading={sending} aria-label={t("messages.send")} title={t("messages.send")}>
             <Send size={16} />
           </Button>
           </div>

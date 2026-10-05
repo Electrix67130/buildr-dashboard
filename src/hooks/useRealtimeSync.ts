@@ -49,6 +49,10 @@ interface Options {
 }
 
 export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled, onAccountDeleted, onReportCreated }: Options): void {
+  // Les callbacks changent a chaque rendu (langue, router) ; l'effet, lui, ne
+  // se rebranche que sur `enabled`. Une ref garde toujours la derniere version.
+  const callbacks = useRef({ onSessionReplaced, onAccountDisabled, onAccountDeleted, onReportCreated });
+  callbacks.current = { onSessionReplaced, onAccountDisabled, onAccountDeleted, onReportCreated };
   const queryClient = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptRef = useRef(0);
@@ -106,7 +110,7 @@ export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled,
           break;
         case "report.created":
           queryClient.invalidateQueries({ queryKey: ["reports"] });
-          onReportCreated?.();
+          callbacks.current.onReportCreated?.();
           break;
       }
     };
@@ -141,17 +145,17 @@ export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled,
 
         if (e.code === 4001) {
           cancelledRef.current = true;
-          onSessionReplaced?.();
+          callbacks.current.onSessionReplaced?.();
           return;
         }
         if (e.code === 4002) {
           cancelledRef.current = true;
-          onAccountDisabled?.();
+          callbacks.current.onAccountDisabled?.();
           return;
         }
         if (e.code === 4003) {
           cancelledRef.current = true;
-          onAccountDeleted?.();
+          callbacks.current.onAccountDeleted?.();
           return;
         }
 

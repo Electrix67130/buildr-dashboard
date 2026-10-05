@@ -33,14 +33,18 @@ export default function ReportList({
   const qc = useQueryClient();
   const confirm = useConfirm();
   const [resolving, setResolving] = useState<Report | null>(null);
+  const [busyId, setBusyId] = useState<string | null>(null);
   const [note, setNote] = useState("");
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["reports"] });
   const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : t("common.error"));
 
   const resolve = useMutation({
-    mutationFn: ({ id, status, note }: { id: string; status: "resolved" | "dismissed"; note?: string }) =>
-      apiFetch(`/reports/${id}`, { method: "PATCH", body: { status, resolution_note: note || undefined } }),
+    mutationFn: ({ id, status, note }: { id: string; status: "resolved" | "dismissed"; note?: string }) => {
+      setBusyId(id);
+      return apiFetch(`/reports/${id}`, { method: "PATCH", body: { status, resolution_note: note || undefined } });
+    },
+    onSettled: () => setBusyId(null),
     onSuccess: (_d, v) => {
       toast.success(v.status === "resolved" ? t("reports.resolvedToast") : t("reports.dismissedToast"));
       setResolving(null);
@@ -122,8 +126,10 @@ export default function ReportList({
                   {r.target_excerpt ? (
                     <blockquote className="mt-2 rounded-md border-l-2 border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-zinc-700 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-300">
                       <span className="line-clamp-3 whitespace-pre-wrap">{r.target_excerpt}</span>
-                      {!r.target_exists ? <span className="mt-1 block text-xs italic text-zinc-500">{t("reports.targetGone")}</span> : null}
                     </blockquote>
+                  ) : null}
+                  {!r.target_exists && r.target_type !== "user" ? (
+                    <p className="mt-1 text-xs italic text-zinc-500">{t("reports.targetGone")}</p>
                   ) : null}
                   {r.comment ? <p className="mt-2 text-sm italic text-zinc-600 dark:text-zinc-400">« {r.comment} »</p> : null}
                   {r.resolution_note ? (
@@ -173,7 +179,7 @@ export default function ReportList({
                     </Button>
                   ) : null}
                   <span className="flex-1" />
-                  <Button variant="secondary" size="sm" onClick={() => resolve.mutate({ id: r.id, status: "dismissed" })} loading={resolve.isPending}>
+                  <Button variant="secondary" size="sm" onClick={() => resolve.mutate({ id: r.id, status: "dismissed" })} loading={busyId === r.id}>
                     <X size={14} />
                     {t("reports.dismiss")}
                   </Button>

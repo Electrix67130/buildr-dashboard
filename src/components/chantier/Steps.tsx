@@ -23,13 +23,21 @@ type Dragging = { kind: "step"; id: string } | { kind: "substep"; id: string; st
 /** Cible d'un ajout de photo : une etape ou une sous-etape. */
 type PhotoTarget = { kind: "step"; id: string } | { kind: "substep"; id: string };
 
-/** Deplace `id` juste avant `beforeId` dans la liste d'identifiants. */
-function moveBefore(ids: string[], id: string, beforeId: string): string[] {
-  if (id === beforeId) return ids;
+type DropSide = "before" | "after";
+
+/** Deplace `id` juste avant ou juste apres `targetId` dans la liste d'identifiants. */
+function moveRelative(ids: string[], id: string, targetId: string, side: DropSide): string[] {
+  if (id === targetId) return ids;
   const without = ids.filter((x) => x !== id);
-  const at = without.indexOf(beforeId);
+  const at = without.indexOf(targetId) + (side === "after" ? 1 : 0);
   without.splice(at, 0, id);
   return without;
+}
+
+/** Au-dessus ou au-dessous du milieu de l'element survole. */
+function dropSide(e: DragEvent): DropSide {
+  const rect = e.currentTarget.getBoundingClientRect();
+  return e.clientY > rect.top + rect.height / 2 ? "after" : "before";
 }
 
 export default function Steps({
@@ -144,20 +152,20 @@ export default function Steps({
     onSettled: invalidate,
   });
 
-  function onDropOnStep(targetStepId: string) {
+  function onDropOnStep(targetStepId: string, side: DropSide) {
     if (!dragging || dragging.kind !== "step" || !list.data) return;
     const ids = list.data.map((s) => s.id);
-    const next = moveBefore(ids, dragging.id, targetStepId);
+    const next = moveRelative(ids, dragging.id, targetStepId, side);
     setDragging(null);
     if (next.join() !== ids.join()) reorderSteps.mutate(next);
   }
 
-  function onDropOnSubstep(stepId: string, targetSubstepId: string) {
+  function onDropOnSubstep(stepId: string, targetSubstepId: string, side: DropSide) {
     if (!dragging || dragging.kind !== "substep" || dragging.stepId !== stepId || !list.data) return;
     const step = list.data.find((s) => s.id === stepId);
     if (!step?.substeps) return;
     const ids = step.substeps.map((s) => s.id);
-    const next = moveBefore(ids, dragging.id, targetSubstepId);
+    const next = moveRelative(ids, dragging.id, targetSubstepId, side);
     setDragging(null);
     if (next.join() !== ids.join()) reorderSubsteps.mutate({ stepId, ordered_ids: next });
   }
@@ -244,8 +252,8 @@ export default function Steps({
                 uploading={uploading}
                 onDragStart={setDragging}
                 onDragEnd={() => setDragging(null)}
-                onDropOnStep={() => onDropOnStep(step.id)}
-                onDropOnSubstep={(substepId) => onDropOnSubstep(step.id, substepId)}
+                onDropOnStep={(side) => onDropOnStep(step.id, side)}
+                onDropOnSubstep={(substepId, side) => onDropOnSubstep(step.id, substepId, side)}
                 onToggle={(id, validated) => toggleStep.mutate({ id, validated })}
                 onRemove={(id) => removeStep.mutate(id)}
                 onAddSubstep={(stepId, name) => createSubstep.mutate({ stepId, name })}
@@ -356,8 +364,8 @@ function StepItem({
   uploading: boolean;
   onDragStart: (d: Dragging) => void;
   onDragEnd: () => void;
-  onDropOnStep: () => void;
-  onDropOnSubstep: (substepId: string) => void;
+  onDropOnStep: (side: DropSide) => void;
+  onDropOnSubstep: (substepId: string, side: DropSide) => void;
   onToggle: (id: string, validated: boolean) => void;
   onRemove: (id: string) => void;
   onAddSubstep: (stepId: string, name: string) => void;
@@ -370,8 +378,8 @@ function StepItem({
   const { t } = useI18n();
   const confirm = useConfirm();
   const [substepName, setSubstepName] = useState("");
-  const [overStep, setOverStep] = useState(false);
-  const [overSubstep, setOverSubstep] = useState<string | null>(null);
+  const [overStep, setOverStep] = useState<DropSide | null>(null);
+  const [overSubstep, setOverSubstep] = useState<{ id: string; side: DropSide } | null>(null);
   const validated = !!step.validated_at;
   const isDraggedStep = dragging?.kind === "step" && dragging.id === step.id;
 
@@ -402,7 +410,8 @@ function StepItem({
       className={cn(
         "group px-6 py-4 transition-colors",
         isDraggedStep && "opacity-40",
-        overStep && dragging?.kind === "step" && !isDraggedStep && "border-t-2 border-orange-500",
+        overStep === "before" && dragging?.kind === "step" && !isDraggedStep && "border-t-2 border-orange-500",
+        overStep === "after" && dragging?.kind === "step" && !isDraggedStep && "border-b-2 border-orange-500",
       )}
       draggable={canManage}
       onDragStart={(e) => {
@@ -410,19 +419,20 @@ function StepItem({
         onDragStart({ kind: "step", id: step.id });
       }}
       onDragEnd={() => {
-        setOverStep(false);
+        setOverStep(null);
         onDragEnd();
       }}
       onDragOver={(e) => {
         if (dragging?.kind !== "step") return;
         allow(e);
-        setOverStep(true);
+        setOverStep(dropSide(e));
       }}
-      onDragLeave={() => setOverStep(false)}
+      onDragLeave={() => setOverStep(null)}
       onDrop={(e) => {
         e.preventDefault();
-        setOverStep(false);
-        onDropOnStep();
+        const side = dropSide(e);
+        setOverStep(null);
+        onDropOnStep(side);
       }}
     >
       <div className="flex items-start gap-3">
@@ -447,7 +457,8 @@ function StepItem({
               : "bg-zinc-100 text-zinc-400 dark:bg-zinc-800" +
                   (canToggle ? " hover:bg-zinc-200 dark:hover:bg-zinc-700" : ""),
           )}
-          aria-label={validated ? t("emergencies.resolved") : t("common.confirm")}
+          aria-label={validated ? t("steps.unvalidateStep") : t("steps.validateStep")}
+          title={validated ? t("steps.unvalidateStep") : t("steps.validateStep")}
         >
           {validated ? <Check size={14} /> : <Circle size={14} />}
         </button>
@@ -465,15 +476,18 @@ function StepItem({
             <ul className="mt-2 space-y-1.5 pl-1">
               {step.substeps.map((s: ChantierSubstep) => {
                 const isDragged = dragging?.kind === "substep" && dragging.id === s.id;
-                const isOver =
-                  overSubstep === s.id && dragging?.kind === "substep" && dragging.stepId === step.id && !isDragged;
+                const over =
+                  overSubstep?.id === s.id && dragging?.kind === "substep" && dragging.stepId === step.id && !isDragged
+                    ? overSubstep.side
+                    : null;
                 return (
                   <li
                     key={s.id}
                     className={cn(
                       "group/sub flex items-start gap-2 text-sm transition-opacity",
                       isDragged && "opacity-40",
-                      isOver && "border-t-2 border-orange-500",
+                      over === "before" && "border-t-2 border-orange-500",
+                      over === "after" && "border-b-2 border-orange-500",
                     )}
                     draggable={canManage}
                     onDragStart={(e) => {
@@ -490,15 +504,16 @@ function StepItem({
                       if (dragging?.kind !== "substep" || dragging.stepId !== step.id) return;
                       e.stopPropagation();
                       allow(e);
-                      setOverSubstep(s.id);
+                      setOverSubstep({ id: s.id, side: dropSide(e) });
                     }}
                     onDragLeave={() => setOverSubstep(null)}
                     onDrop={(e) => {
                       if (dragging?.kind !== "substep") return;
                       e.preventDefault();
                       e.stopPropagation();
+                      const side = dropSide(e);
                       setOverSubstep(null);
-                      onDropOnSubstep(s.id);
+                      onDropOnSubstep(s.id, side);
                     }}
                   >
                     {canManage ? (
@@ -513,6 +528,8 @@ function StepItem({
                     <button
                       onClick={() => canToggle && onToggleSubstep(s.id, !s.validated_at)}
                       disabled={!canToggle}
+                      aria-label={s.validated_at ? t("steps.unvalidateSubstep") : t("steps.validateSubstep")}
+                      title={s.validated_at ? t("steps.unvalidateSubstep") : t("steps.validateSubstep")}
                       className={cn(
                         "mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded border transition-colors",
                         !canToggle && "cursor-default",

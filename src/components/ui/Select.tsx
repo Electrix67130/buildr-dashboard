@@ -1,4 +1,4 @@
-import { SelectHTMLAttributes, forwardRef, ReactNode } from "react";
+import { SelectHTMLAttributes, forwardRef, ReactNode, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
@@ -12,7 +12,8 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
   { className, label, error, hint, id, children, ...rest },
   ref,
 ) {
-  const inputId = id || rest.name;
+  const generatedId = useId();
+  const inputId = id || rest.name || generatedId;
   return (
     <div className="flex flex-col gap-1.5">
       {label ? (

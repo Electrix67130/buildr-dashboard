@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Search, Ban, CheckCircle, KeyRound, LogOut, Trash2 } from "lucide-react";
@@ -10,6 +10,7 @@ import Select from "@/components/ui/Select";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import { adminApi, type AdminUserRole, type AdminUserStatus, type UserFilters } from "@/lib/admin-api";
+import { ApiError } from "@/lib/api";
 import { formatDate } from "@/lib/utils";
 import { useConfirm, useAlert } from "@/contexts/DialogContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -20,6 +21,12 @@ export default function AdminUsersPage() {
   const confirm = useConfirm();
   const showAlert = useAlert();
   const [search, setSearch] = useState("");
+  // La requete part 300 ms apres la derniere frappe, pas a chaque touche.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedSearch(search), 300);
+    return () => clearTimeout(id);
+  }, [search]);
   const [orgId, setOrgId] = useState("");
   const [role, setRole] = useState<AdminUserRole | "">("");
   const [status, setStatus] = useState<AdminUserStatus | "">("");
@@ -28,7 +35,7 @@ export default function AdminUsersPage() {
   const [order, setOrder] = useState<NonNullable<UserFilters["order"]>>("desc");
 
   const filters: UserFilters = {
-    q: search || undefined,
+    q: debouncedSearch || undefined,
     organization_id: orgId || undefined,
     role: role || undefined,
     status: status || undefined,
@@ -48,6 +55,7 @@ export default function AdminUsersPage() {
   const hasFilters = !!(orgId || role || status || superOnly || search);
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["admin", "users"] });
+  const onError = (err: unknown) => toast.error(err instanceof ApiError ? err.message : t("common.error"));
 
   const enable = useMutation({
     mutationFn: adminApi.enableUser,
@@ -55,6 +63,7 @@ export default function AdminUsersPage() {
       toast.success(t("admin.userReactivated"));
       invalidate();
     },
+    onError,
   });
   const disable = useMutation({
     mutationFn: adminApi.disableUser,
@@ -62,12 +71,14 @@ export default function AdminUsersPage() {
       toast.success(t("admin.userDeactivatedToast"));
       invalidate();
     },
+    onError,
   });
   const kick = useMutation({
     mutationFn: adminApi.kickSessions,
     onSuccess: (data) => {
       toast.success(t("admin.sessionsKilled", { count: data.sessions_killed }));
     },
+    onError,
   });
   const reset = useMutation({
     mutationFn: adminApi.forceReset,
@@ -78,6 +89,7 @@ export default function AdminUsersPage() {
         tone: "info",
       });
     },
+    onError,
   });
   const remove = useMutation({
     mutationFn: adminApi.deleteUser,
@@ -85,15 +97,14 @@ export default function AdminUsersPage() {
       toast.success(t("admin.userDeleted"));
       invalidate();
     },
+    onError,
   });
 
   return (
     <div className="flex flex-col gap-6">
       <div>
         <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("admin.users")}</h1>
-        <p className="text-sm text-zinc-500">
-          {data?.meta.total ?? 0} utilisateur{(data?.meta.total ?? 0) > 1 ? "s" : ""}
-        </p>
+        <p className="text-sm text-zinc-500">{t("admin.usersCount", { count: data?.meta.total ?? 0 })}</p>
       </div>
 
       <Card>
@@ -191,7 +202,7 @@ export default function AdminUsersPage() {
                       {u.first_name} {u.last_name}
                     </p>
                     {u.deleted_at ? (
-                      <Badge variant="default">{t("admin.filterDeleted")}</Badge>
+                      <Badge variant="default">{t("admin.deletedBadge")}</Badge>
                     ) : !u.is_active ? (
                       <Badge variant="danger">{t("admin.userDeactivatedBadge")}</Badge>
                     ) : null}
@@ -210,20 +221,20 @@ export default function AdminUsersPage() {
                     {u.email}
                     {u.phone ? ` · ${u.phone}` : ""}
                   </p>
-                  <p className="mt-0.5 text-xs text-zinc-500">Inscrit le {formatDate(u.created_at)}</p>
+                  <p className="mt-0.5 text-xs text-zinc-500">{t("admin.registeredOn", { date: formatDate(u.created_at) })}</p>
                 </div>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={async () => {
                     const ok = await confirm({
-                      title: "Reset password",
+                      title: t("admin.resetPasswordTitle"),
                       description: t("admin.confirmForceReset", { email: u.email }),
-                      confirmLabel: "Reset",
+                      confirmLabel: t("admin.resetPasswordConfirm"),
                     });
                     if (ok) reset.mutate(u.id);
                   }}
-                  title="Force reset password"
+                  title={t("admin.resetPasswordTitle")}
                 >
                   <KeyRound size={14} />
                 </Button>
@@ -232,14 +243,14 @@ export default function AdminUsersPage() {
                   size="sm"
                   onClick={async () => {
                     const ok = await confirm({
-                      title: "Kick sessions",
+                      title: t("admin.kickSessionsTitle"),
                       description: t("admin.confirmKickSessions", { email: u.email }),
-                      confirmLabel: "Kick",
+                      confirmLabel: t("admin.kickSessionsConfirm"),
                       tone: "danger",
                     });
                     if (ok) kick.mutate(u.id);
                   }}
-                  title="Kick sessions"
+                  title={t("admin.kickSessionsTitle")}
                 >
                   <LogOut size={14} />
                 </Button>
@@ -259,8 +270,8 @@ export default function AdminUsersPage() {
                   >
                     <Ban size={14} />
                   </Button>
-                ) : (
-                  <Button size="sm" onClick={() => enable.mutate(u.id)}>
+                ) : u.deleted_at ? null : (
+                  <Button size="sm" onClick={() => enable.mutate(u.id)} title={t("admin.reactivate")}>
                     <CheckCircle size={14} />
                   </Button>
                 )}
@@ -276,7 +287,7 @@ export default function AdminUsersPage() {
                     });
                     if (ok) remove.mutate(u.id);
                   }}
-                  title="Delete user"
+                  title={t("admin.permanentDelete")}
                 >
                   <Trash2 size={14} />
                 </Button>

@@ -1,4 +1,4 @@
-import { InputHTMLAttributes, forwardRef } from "react";
+import { InputHTMLAttributes, forwardRef, useId } from "react";
 import { cn } from "@/lib/utils";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -17,7 +17,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { className, inputClassName, label, error, hint, id, ...rest },
   ref,
 ) {
-  const inputId = id || rest.name;
+  const generatedId = useId();
+  const inputId = id || rest.name || generatedId;
   return (
     // La className va au conteneur, pas au champ : c'est le conteneur qui est
     // l'element de grille. Appliquee au <input>, un `col-span-2` n'avait aucun
