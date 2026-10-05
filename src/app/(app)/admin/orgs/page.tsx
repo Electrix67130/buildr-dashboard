@@ -96,13 +96,13 @@ export default function AdminOrgsPage() {
                   size="sm"
                   onClick={async () => {
                     const ok = await confirm({
-                      title: `Impersonate ${o.name}`,
+                      title: t("admin.impersonateTitle", { name: o.name }),
                       description: t("admin.confirmImpersonate", { name: o.name }),
-                      confirmLabel: "Impersonate",
+                      confirmLabel: t("admin.impersonateConfirm"),
                     });
                     if (ok) impersonate.mutate(o.id);
                   }}
-                  title="Login as admin"
+                  title={t("admin.loginAsAdmin")}
                 >
                   <LogIn size={14} />
                   Impersonate

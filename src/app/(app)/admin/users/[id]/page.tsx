@@ -126,9 +126,9 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
               variant="secondary"
               onClick={async () => {
                 const ok = await confirm({
-                  title: "Reset password",
+                  title: t("admin.resetPasswordTitle"),
                   description: t("admin.confirmForceReset", { email: data.email }),
-                  confirmLabel: "Reset",
+                  confirmLabel: t("admin.resetPasswordConfirm"),
                 });
                 if (ok) reset.mutate();
               }}
@@ -140,9 +140,9 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
               variant="secondary"
               onClick={async () => {
                 const ok = await confirm({
-                  title: "Kick sessions",
+                  title: t("admin.kickSessionsTitle"),
                   description: t("admin.confirmKickSessions", { email: data.email }),
-                  confirmLabel: "Kick",
+                  confirmLabel: t("admin.kickSessionsConfirm"),
                   tone: "danger",
                 });
                 if (ok) kick.mutate();
@@ -194,7 +194,7 @@ export default function AdminUserDetailPage({ params }: { params: Promise<{ id: 
             <h2 className="mb-3 text-sm font-semibold text-zinc-900 dark:text-white">{t("chantier.details")}</h2>
             <dl className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <div>
-                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">Email</dt>
+                <dt className="text-xs font-medium uppercase tracking-wide text-zinc-500">{t("auth.email")}</dt>
                 <dd className="mt-0.5 text-zinc-900 dark:text-white">{data.email}</dd>
               </div>
               <div>
