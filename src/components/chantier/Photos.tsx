@@ -150,7 +150,7 @@ export default function Photos({
           </button>
           <div className="max-h-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={selected.url} alt="" className="max-h-[85vh] rounded-lg" />
+            <img loading="lazy" decoding="async" src={selected.url} alt="" className="max-h-[85vh] rounded-lg" />
             {selected.caption ? (
               <p className="mt-2 text-center text-sm text-white">{selected.caption}</p>
             ) : null}
