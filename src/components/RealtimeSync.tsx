@@ -34,6 +34,9 @@ export default function RealtimeSync() {
       await logout();
       router.replace("/login");
     },
+    onReportCreated: () => {
+      toast(t("reports.newToast"), { action: { label: t("common.open"), onClick: () => router.push("/reports") } });
+    },
   });
 
   return null;

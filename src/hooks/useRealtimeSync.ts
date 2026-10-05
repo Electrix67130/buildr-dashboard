@@ -26,7 +26,8 @@ export type RealtimeEventType =
   | "chantier-member.created"
   | "chantier-member.updated"
   | "chantier-member.deleted"
-  | "membership.updated";
+  | "membership.updated"
+  | "report.created";
 
 interface RealtimeEvent {
   type: RealtimeEventType;
@@ -43,9 +44,11 @@ interface Options {
   onAccountDisabled?: () => void;
   /** Appelé quand le serveur ferme avec le code 4003 : le compte vient d'être supprimé. */
   onAccountDeleted?: () => void;
+  /** Un signalement vient d'arriver pour cet administrateur. */
+  onReportCreated?: () => void;
 }
 
-export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled, onAccountDeleted }: Options): void {
+export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled, onAccountDeleted, onReportCreated }: Options): void {
   const queryClient = useQueryClient();
   const wsRef = useRef<WebSocket | null>(null);
   const reconnectAttemptRef = useRef(0);
@@ -100,6 +103,10 @@ export function useRealtimeSync({ enabled, onSessionReplaced, onAccountDisabled,
         case "membership.updated":
           // Le role conditionne tout ce que l'API renvoie : on relit tout.
           queryClient.invalidateQueries();
+          break;
+        case "report.created":
+          queryClient.invalidateQueries({ queryKey: ["reports"] });
+          onReportCreated?.();
           break;
       }
     };

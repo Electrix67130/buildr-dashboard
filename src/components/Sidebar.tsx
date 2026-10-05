@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, Building2, Archive, Users, FileText, CreditCard, Settings, ShieldCheck, LifeBuoy, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Building2, Archive, Users, FileText, CreditCard, Settings, ShieldCheck, LifeBuoy, MessageSquare, Flag } from "lucide-react";
+import { usePendingReportsCount } from "@/hooks/useReports";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -16,6 +17,7 @@ const NAV_ALL = [
   { href: "/team", labelKey: "nav.team", icon: Users, key: "team" as const },
   { href: "/templates", labelKey: "nav.templates", icon: FileText, key: "templates" as const },
   { href: "/billing", labelKey: "nav.billing", icon: CreditCard, key: "billing" as const },
+  { href: "/reports", labelKey: "nav.reports", icon: Flag, key: "reports" as const },
   { href: "/settings", labelKey: "nav.settings", icon: Settings, key: "settings" as const },
   // Ouvert a tous les roles : c'est souvent l'ouvrier sur le chantier qui
   // rencontre le bug, pas l'administrateur au bureau.
@@ -28,6 +30,7 @@ const SUPER_ADMIN_NAV = [
   { href: "/admin/users", labelKey: "admin.users", icon: Users, key: "admin-users" as const },
   { href: "/admin/audit", labelKey: "admin.audit", icon: FileText, key: "admin-audit" as const },
   { href: "/admin/feedback", labelKey: "admin.feedback", icon: MessageSquare, key: "admin-feedback" as const },
+  { href: "/admin/reports", labelKey: "admin.reports", icon: Flag, key: "admin-reports" as const },
   { href: "/admin/errors", labelKey: "admin.errors", icon: ShieldCheck, key: "admin-errors" as const },
 ];
 
@@ -41,7 +44,11 @@ export default function Sidebar() {
     0,
   );
 
+  const isAdmin = user?.role === "admin";
+  const pendingReports = usePendingReportsCount(!!user && isAdmin);
+
   const visible = NAV_ALL.filter((item) => {
+    if (item.key === "reports") return isAdmin;
     if (item.key === "team") return canSeeOrgTeamSection(user);
     if (item.key === "templates") return canSeeTemplatesSection(user);
     if (item.key === "billing") return canSeeBillingSection(user);
@@ -62,7 +69,12 @@ export default function Sidebar() {
         {visible.map((item) => {
           const Icon = item.icon;
           const active = pathname === item.href || pathname.startsWith(item.href + "/");
-          const badge = item.key === "chantiers" && totalUnread > 0 ? totalUnread : 0;
+          const badge =
+            item.key === "chantiers" && totalUnread > 0
+              ? totalUnread
+              : item.key === "reports"
+                ? (pendingReports.data ?? 0)
+                : 0;
           return (
             <Link
               key={item.href}
