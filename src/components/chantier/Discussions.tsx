@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import MessageThread from "@/components/MessageThread";
+import ReportDialog, { type ReportDialogTarget } from "@/components/reports/ReportDialog";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { useI18n } from "@/contexts/I18nContext";
@@ -21,6 +23,7 @@ export default function Discussions({
   const { user } = useAuth();
   const { t } = useI18n();
   const queryKey = ["comments", chantierId, "chantier-level"] as const;
+  const [reportTarget, setReportTarget] = useState<ReportDialogTarget | null>(null);
 
   const list = useQuery({
     queryKey,
@@ -89,6 +92,7 @@ export default function Discussions({
         onBlock={(userId) => block.mutate(userId)}
       onEdit={(id, content) => edit.mutate({ id, content })}
       onDelete={(id) => remove.mutate(id)}
+      onReport={(msg) => setReportTarget({ type: "comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${msg.content.slice(0, 120)}` })}
       sending={create.isPending}
     />
   );

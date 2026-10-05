@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import type { PaginatedResponse } from "@/types/api";
 
-export type ReportTarget = "comment" | "photo" | "user";
+export type ReportTarget = "comment" | "emergency_comment" | "photo" | "user";
 export type ReportReason = "inappropriate" | "harassment" | "off_topic" | "other";
 export type ReportStatus = "pending" | "resolved" | "dismissed";
 

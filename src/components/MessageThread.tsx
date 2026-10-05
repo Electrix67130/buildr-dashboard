@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { Send, Pencil, Trash2, Check, X, Reply, SmilePlus, Ban } from "lucide-react";
+import { Send, Pencil, Trash2, Check, X, Reply, SmilePlus, Ban, Flag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { REACTION_EMOJIS } from "@/types/api";
 import Avatar from "@/components/ui/Avatar";
@@ -43,6 +43,8 @@ interface Props {
   onReact?: (id: string, emoji: string) => void;
   /** Bloquer l'auteur d'un message : ses messages et photos disparaissent pour moi. */
   onBlock?: (authorId: string, name: string) => void;
+  /** Signaler un message d'autrui a l'administrateur de l'organisation. */
+  onReport?: (message: ThreadMessage) => void;
   sending?: boolean;
   /**
    * Considère le message comme "modifié" si updated_at - created_at > 2s
@@ -65,6 +67,7 @@ export default function MessageThread({
   onDelete,
   onReact,
   onBlock,
+  onReport,
   sending = false,
   editedThresholdMs = 2000,
 }: Props) {
@@ -266,7 +269,7 @@ export default function MessageThread({
                   ) : null}
                 </div>
 
-                {!isEditing && (interactive || isOwn || canDeleteOthers || onBlock) ? (
+                {!isEditing && (interactive || isOwn || canDeleteOthers || onBlock || onReport) ? (
                   <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                     {interactive ? (
                       <div className="relative">
@@ -307,6 +310,16 @@ export default function MessageThread({
                         title={t("messages.reply")}
                       >
                         <Reply size={14} />
+                      </button>
+                    ) : null}
+                    {!isOwn && onReport ? (
+                      <button
+                        onClick={() => onReport(m)}
+                        className="rounded-lg p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                        aria-label={t("report.action")}
+                        title={t("report.action")}
+                      >
+                        <Flag size={14} />
                       </button>
                     ) : null}
                     {!isOwn && onBlock ? (

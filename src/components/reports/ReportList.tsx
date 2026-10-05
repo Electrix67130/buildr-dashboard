@@ -17,7 +17,7 @@ import { useI18n } from "@/contexts/I18nContext";
 import { useConfirm } from "@/contexts/DialogContext";
 import type { Report } from "@/hooks/useReports";
 
-const TARGET_ICON = { comment: MessageSquare, photo: ImageIcon, user: User } as const;
+const TARGET_ICON = { comment: MessageSquare, emergency_comment: MessageSquare, photo: ImageIcon, user: User } as const;
 
 export default function ReportList({
   reports,
@@ -51,11 +51,13 @@ export default function ReportList({
   });
 
   const deleteContent = useMutation({
-    mutationFn: (r: Report) => apiFetch(`/${r.target_type === "comment" ? "comments" : "photos"}/${r.target_id}`, { method: "DELETE" }),
+    mutationFn: (r: Report) =>
+      apiFetch(`/${r.target_type === "comment" ? "comments" : r.target_type === "emergency_comment" ? "emergency-comments" : "photos"}/${r.target_id}`, { method: "DELETE" }),
     onSuccess: () => {
       toast.success(t("reports.contentDeleted"));
       invalidate();
       qc.invalidateQueries({ queryKey: ["comments"] });
+      qc.invalidateQueries({ queryKey: ["emergency-comments"] });
       qc.invalidateQueries({ queryKey: ["photos"] });
     },
     onError,

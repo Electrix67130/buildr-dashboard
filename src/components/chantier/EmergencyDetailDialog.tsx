@@ -7,6 +7,7 @@ import { useState } from "react";
 import Modal from "@/components/ui/Modal";
 import Badge from "@/components/ui/Badge";
 import MessageThread from "@/components/MessageThread";
+import ReportDialog, { type ReportDialogTarget } from "@/components/reports/ReportDialog";
 import { apiFetch, ApiError } from "@/lib/api";
 import { formatDateTime } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -32,6 +33,7 @@ export default function EmergencyDetailDialog({
   const { user } = useAuth();
   const { t } = useI18n();
   const queryKey = ["emergency-comments", emergency.id] as const;
+  const [reportTarget, setReportTarget] = useState<ReportDialogTarget | null>(null);
   const [lightbox, setLightbox] = useState<string | null>(null);
   // Toutes les photos de l'urgence ; les anciennes n'ont que photo_url.
   const photos =
@@ -162,6 +164,7 @@ export default function EmergencyDetailDialog({
             onSend={(content) => create.mutate(content)}
             onEdit={(id, content) => edit.mutate({ id, content })}
             onDelete={(id) => remove.mutate(id)}
+            onReport={(msg) => setReportTarget({ type: "emergency_comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${msg.content.slice(0, 120)}` })}
             sending={create.isPending}
           />
         </div>
