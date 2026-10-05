@@ -56,6 +56,17 @@ export default function Discussions({
     onError,
   });
 
+  const block = useMutation({
+    mutationFn: (userId: string) => apiFetch("/blocks", { method: "POST", body: { user_id: userId } }),
+    onSuccess: () => {
+      toast.success(t("block.done"));
+      qc.invalidateQueries({ queryKey: ["comments"] });
+      qc.invalidateQueries({ queryKey: ["photos"] });
+      qc.invalidateQueries({ queryKey: ["blocks"] });
+    },
+    onError,
+  });
+
   const remove = useMutation({
     mutationFn: (id: string) => apiFetch(`/comments/${id}`, { method: "DELETE" }),
     onSuccess: invalidate,
@@ -75,6 +86,7 @@ export default function Discussions({
       placeholder={t("discussions.placeholder")}
       onSend={(content, replyToId) => create.mutate({ content, replyToId })}
       onReact={(id, emoji) => react.mutate({ id, emoji })}
+        onBlock={(userId) => block.mutate(userId)}
       onEdit={(id, content) => edit.mutate({ id, content })}
       onDelete={(id) => remove.mutate(id)}
       sending={create.isPending}

@@ -34,6 +34,19 @@ export default function SettingsPage() {
   const confirm = useConfirm();
   const isAdmin = user?.role === "admin";
 
+  const blocks = useQuery({
+    queryKey: ["blocks"],
+    queryFn: () => apiFetch<{ data: { user_id: string; first_name: string; last_name: string }[] }>("/blocks"),
+  });
+  const unblock = useMutation({
+    mutationFn: (userId: string) => apiFetch(`/blocks/${userId}`, { method: "DELETE" }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["blocks"] });
+      qc.invalidateQueries({ queryKey: ["comments"] });
+      qc.invalidateQueries({ queryKey: ["photos"] });
+    },
+  });
+
   const org = useQuery({
     queryKey: ["organization"],
     queryFn: () => apiFetch<Organization>("/organization"),
@@ -472,6 +485,27 @@ export default function SettingsPage() {
           </form>
         </Card>
       ) : null}
+
+      <Card>
+        <h2 className="text-sm font-semibold text-zinc-900 dark:text-white">{t("block.section")}</h2>
+        <p className="mt-1 text-xs text-zinc-500">{t("block.hint")}</p>
+        {blocks.data && blocks.data.data.length > 0 ? (
+          <ul className="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800">
+            {blocks.data.data.map((b) => (
+              <li key={b.user_id} className="flex items-center justify-between py-2 text-sm">
+                <span className="text-zinc-800 dark:text-zinc-200">
+                  {b.first_name} {b.last_name}
+                </span>
+                <Button variant="ghost" size="sm" onClick={() => unblock.mutate(b.user_id)} loading={unblock.isPending}>
+                  {t("block.unblock")}
+                </Button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="mt-3 text-sm text-zinc-500">{t("block.empty")}</p>
+        )}
+      </Card>
 
       {isAdmin && org.data ? <OrgLegalForm org={org.data} /> : null}
 

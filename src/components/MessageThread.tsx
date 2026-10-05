@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
-import { Send, Pencil, Trash2, Check, X, Reply, SmilePlus } from "lucide-react";
+import { Send, Pencil, Trash2, Check, X, Reply, SmilePlus, Ban } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { REACTION_EMOJIS } from "@/types/api";
 import Avatar from "@/components/ui/Avatar";
@@ -41,6 +41,8 @@ interface Props {
   onDelete: (id: string) => void;
   /** Absent : le fil ne propose ni reponse citee ni reaction (urgences). */
   onReact?: (id: string, emoji: string) => void;
+  /** Bloquer l'auteur d'un message : ses messages et photos disparaissent pour moi. */
+  onBlock?: (authorId: string, name: string) => void;
   sending?: boolean;
   /**
    * Considère le message comme "modifié" si updated_at - created_at > 2s
@@ -62,6 +64,7 @@ export default function MessageThread({
   onEdit,
   onDelete,
   onReact,
+  onBlock,
   sending = false,
   editedThresholdMs = 2000,
 }: Props) {
@@ -263,7 +266,7 @@ export default function MessageThread({
                   ) : null}
                 </div>
 
-                {!isEditing && (interactive || isOwn || canDeleteOthers) ? (
+                {!isEditing && (interactive || isOwn || canDeleteOthers || onBlock) ? (
                   <div className="flex flex-col gap-1 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
                     {interactive ? (
                       <div className="relative">
@@ -304,6 +307,25 @@ export default function MessageThread({
                         title={t("messages.reply")}
                       >
                         <Reply size={14} />
+                      </button>
+                    ) : null}
+                    {!isOwn && onBlock ? (
+                      <button
+                        onClick={async () => {
+                          const name = `${m.first_name} ${m.last_name}`;
+                          const ok = await confirm({
+                            title: t("block.confirmTitle", { name }),
+                            description: t("block.confirmBody"),
+                            confirmLabel: t("block.action"),
+                            tone: "danger",
+                          });
+                          if (ok) onBlock(m.author_id, name);
+                        }}
+                        className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"
+                        aria-label={t("block.action")}
+                        title={t("block.action")}
+                      >
+                        <Ban size={14} />
                       </button>
                     ) : null}
                     {isOwn ? (
