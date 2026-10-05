@@ -36,6 +36,9 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npx tsc --noEmit
+      # La suite de tests (Vitest + Testing Library) : une fenetre declaree mais
+      # jamais montee passait le typage et le build, pas un test de composant.
+      - run: npm test
       # Le build sert de garde-fou : une page qui ne compile pas ne doit jamais
       # partir en production. Les variables NEXT_PUBLIC_* reelles sont injectees
       # au build Docker sur le VPS, pas ici.
