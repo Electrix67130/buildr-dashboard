@@ -163,8 +163,14 @@ export default function CreateChantierModal({ open, onClose, onCreated }: Props)
             }))
           }
           onAddressChange={(value) => update("address", value)}
-          onAddressSelect={(name, lat, lng) =>
-            setForm((prev) => ({ ...prev, address: name, latitude: lat, longitude: lng }))
+          onAddressSelect={(name, lat, lng, cp) =>
+            setForm((prev) => ({
+              ...prev,
+              address: name,
+              latitude: lat,
+              longitude: lng,
+              postal_code: cp || prev.postal_code,
+            }))
           }
         />
 
