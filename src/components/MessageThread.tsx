@@ -305,7 +305,8 @@ export default function MessageThread({
                         ) : null}
                       </div>
                     ) : null}
-                    {interactive ? (
+                    {/* On repond aux autres ; son propre message, on le modifie. */}
+                    {interactive && !isOwn ? (
                       <button
                         onClick={() => beginReply(m)}
                         className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 dark:hover:bg-zinc-800 dark:hover:text-zinc-200"

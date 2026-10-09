@@ -75,6 +75,13 @@ describe("MessageThread — envoi", () => {
 });
 
 describe("MessageThread — reponse citee", () => {
+  it("on ne repond pas a son propre message : on le modifie", () => {
+    setup({ onReact: vi.fn() });
+    expect(within(messageBlock("mine")).queryByRole("button", { name: "Répondre" })).not.toBeInTheDocument();
+    expect(within(messageBlock("mine")).getByRole("button", { name: "Modifier" })).toBeInTheDocument();
+    expect(within(messageBlock("theirs")).getByRole("button", { name: "Répondre" })).toBeInTheDocument();
+  });
+
   it("« Repondre » puis envoi transmet l'identifiant du message cite", async () => {
     const { user, onSend } = setup({ onReact: vi.fn() });
     await user.click(within(messageBlock("theirs")).getByRole("button", { name: "Répondre" }));
