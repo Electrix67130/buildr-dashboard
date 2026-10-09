@@ -5,6 +5,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Modal from "@/components/ui/Modal";
 import MessageThread from "@/components/MessageThread";
+import { useMentionable } from "@/hooks/useMentionable";
+import { mentionsToText } from "@/lib/mentions";
 import ReportDialog, { type ReportDialogTarget } from "@/components/reports/ReportDialog";
 import { apiFetch, ApiError } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -33,6 +35,7 @@ export default function StepDiscussionDialog({
   const qc = useQueryClient();
   const { user } = useAuth();
   const { t } = useI18n();
+  const mentionable = useMentionable(chantierId, "comments");
   const queryKey = ["comments", chantierId, "step", stepId] as const;
   const [reportTarget, setReportTarget] = useState<ReportDialogTarget | null>(null);
 
@@ -99,6 +102,7 @@ export default function StepDiscussionDialog({
       size="lg"
     >
       <MessageThread
+        mentionable={mentionable.data}
         messages={list.data?.data ?? []}
         currentUserId={user?.id}
         isLoading={list.isLoading}
@@ -112,7 +116,7 @@ export default function StepDiscussionDialog({
         onBlock={(userId) => block.mutate(userId)}
         onEdit={(id, content) => edit.mutate({ id, content })}
         onDelete={(id) => remove.mutate(id)}
-        onReport={(msg) => setReportTarget({ type: "comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${msg.content.slice(0, 120)}` })}
+        onReport={(msg) => setReportTarget({ type: "comment", id: msg.id, label: `${msg.first_name} ${msg.last_name} : ${mentionsToText(msg.content).slice(0, 120)}` })}
         sending={create.isPending}
       />
       <ReportDialog target={reportTarget} onClose={() => setReportTarget(null)} />

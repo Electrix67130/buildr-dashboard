@@ -10,6 +10,10 @@ import EmptyState from "@/components/ui/EmptyState";
 import { formatDateTime } from "@/lib/utils";
 import { useI18n } from "@/contexts/I18nContext";
 import { useConfirm } from "@/contexts/DialogContext";
+import { useMentionInput } from "@/hooks/useMentionInput";
+import { MentionMenu, MentionText } from "@/components/Mentions";
+import { mentionsToText } from "@/lib/mentions";
+import type { MentionableUser } from "@/types/api";
 
 export interface ThreadMessage {
   id: string;
@@ -46,6 +50,8 @@ interface Props {
   /** Signaler un message d'autrui a l'administrateur de l'organisation. */
   onReport?: (message: ThreadMessage) => void;
   sending?: boolean;
+  /** Les personnes qu'on peut mentionner avec « @ » ; absent, pas de mention a la saisie. */
+  mentionable?: MentionableUser[];
   /**
    * Considère le message comme "modifié" si updated_at - created_at > 2s
    * (compense les petits décalages côté serveur).
@@ -69,17 +75,20 @@ export default function MessageThread({
   onBlock,
   onReport,
   sending = false,
+  mentionable,
   editedThresholdMs = 2000,
 }: Props) {
   const { t } = useI18n();
   const confirm = useConfirm();
-  const [text, setText] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const editRef = useRef<HTMLTextAreaElement>(null);
+  const composer = useMentionInput(mentionable, textareaRef);
+  const editor = useMentionInput(mentionable, editRef);
+  const text = composer.text;
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editText, setEditText] = useState("");
   const [replyTo, setReplyTo] = useState<ThreadMessage | null>(null);
   const [pickerFor, setPickerFor] = useState<string | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const interactive = !!onReact;
 
   const authorName = (m: { author_id: string; first_name: string; last_name: string }) =>
@@ -98,28 +107,25 @@ export default function MessageThread({
   };
 
   const send = () => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    onSend(trimmed, replyTo?.id);
-    setText("");
+    if (!text.trim()) return;
+    onSend(composer.serialize(), replyTo?.id);
+    composer.reset();
     setReplyTo(null);
   };
 
   const beginEdit = (m: ThreadMessage) => {
     setEditingId(m.id);
-    setEditText(m.content);
+    editor.load(m.content);
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setEditText("");
+    editor.reset();
   };
 
   const saveEdit = () => {
-    if (!editingId) return;
-    const trimmed = editText.trim();
-    if (!trimmed) return;
-    onEdit(editingId, trimmed);
+    if (!editingId || !editor.text.trim()) return;
+    onEdit(editingId, editor.serialize());
     cancelEdit();
   };
 
@@ -129,6 +135,8 @@ export default function MessageThread({
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
+    // La liste des mentions, quand elle est ouverte, prend les fleches et Entree.
+    if (composer.handleKeyDown(e)) return;
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       send();
@@ -151,18 +159,18 @@ export default function MessageThread({
               <Reply size={12} className="text-orange-600" />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold text-orange-700 dark:text-orange-300">{t("messages.replyingTo", { name: authorName(replyTo) })}</p>
-                <p className="truncate text-zinc-500">{replyTo.content}</p>
+                <p className="truncate text-zinc-500">{mentionsToText(replyTo.content)}</p>
               </div>
               <button type="button" onClick={() => setReplyTo(null)} className="rounded p-1 text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200" aria-label={t("common.cancel")}>
                 <X size={12} />
               </button>
             </div>
           ) : null}
-          <div className="flex gap-2">
+          <div className="relative flex gap-2">
+          <MentionMenu people={composer.suggestions} highlighted={composer.highlighted} onPick={composer.pick} />
           <textarea
             ref={textareaRef}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
+            {...composer.textareaProps}
             placeholder={placeholder ?? t("discussions.placeholder")}
             rows={1}
             className="min-h-10 flex-1 resize-none bg-transparent px-2 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none dark:text-zinc-100"
@@ -228,20 +236,15 @@ export default function MessageThread({
                       className="mt-1.5 block w-full rounded-md border-l-2 border-orange-500 bg-zinc-50 px-3 py-1.5 text-left text-xs hover:bg-zinc-100 dark:bg-zinc-800 dark:hover:bg-zinc-700"
                     >
                       <p className="font-semibold text-orange-700 dark:text-orange-300">{authorName(m.reply_to)}</p>
-                      <p className="line-clamp-2 text-zinc-500 dark:text-zinc-400">{m.reply_to.content}</p>
+                      <p className="line-clamp-2 text-zinc-500 dark:text-zinc-400">{mentionsToText(m.reply_to.content)}</p>
                     </button>
                   ) : null}
 
                   {isEditing ? (
-                    <EditField
-                      value={editText}
-                      onChange={setEditText}
-                      onSave={saveEdit}
-                      onCancel={cancelEdit}
-                    />
+                    <EditField editor={editor} editRef={editRef} onSave={saveEdit} onCancel={cancelEdit} />
                   ) : (
                     <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-700 dark:text-zinc-300">
-                      {m.content}
+                      <MentionText content={m.content} currentUserId={currentUserId} />
                     </p>
                   )}
 
@@ -381,34 +384,35 @@ export default function MessageThread({
 }
 
 function EditField({
-  value,
-  onChange,
+  editor,
+  editRef: ref,
   onSave,
   onCancel,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  editor: ReturnType<typeof useMentionInput>;
+  editRef: React.RefObject<HTMLTextAreaElement | null>;
   onSave: () => void;
   onCancel: () => void;
 }) {
   const { t } = useI18n();
-  const ref = useRef<HTMLTextAreaElement>(null);
+  const value = editor.text;
 
   useEffect(() => {
     ref.current?.focus();
     const v = ref.current?.value ?? "";
     ref.current?.setSelectionRange(v.length, v.length);
-  }, []);
+  }, [ref]);
 
   return (
-    <div className="mt-2 flex flex-col gap-2">
+    <div className="relative mt-2 flex flex-col gap-2">
+      <MentionMenu people={editor.suggestions} highlighted={editor.highlighted} onPick={editor.pick} />
       <textarea
         ref={ref}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
+        {...editor.textareaProps}
         rows={2}
         className="w-full resize-none rounded-lg border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-orange-500 focus:outline-none focus:ring-2 focus:ring-orange-500/30 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
         onKeyDown={(e) => {
+          if (editor.handleKeyDown(e)) return;
           if (e.key === "Escape") {
             e.preventDefault();
             onCancel();

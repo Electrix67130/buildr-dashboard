@@ -241,3 +241,46 @@ describe("MessageThread — modifier et supprimer", () => {
     expect(within(messageBlock("m")).getByText(/modifié/)).toBeInTheDocument();
   });
 });
+
+describe("MessageThread — mentions", () => {
+  const PAUL = "8f2c1a4e-3b5d-4c6e-9f70-1a2b3c4d5e6f";
+  const people = [
+    { id: PAUL, first_name: "Paul", last_name: "Martin" },
+    { id: "1b2c3d4e-5f60-4718-8a9b-0c1d2e3f4a5b", first_name: "Claire", last_name: "Durand" },
+  ];
+
+  it("« @ » propose les personnes du fil ; Entree choisit, l'envoi transmet la mention", async () => {
+    const { user, onSend } = setup({ mentionable: people });
+    const field = screen.getByPlaceholderText("Écrire un message…");
+    await user.type(field, "Salut @pa");
+    expect(screen.getByRole("listbox")).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /Paul Martin/ })).toBeInTheDocument();
+    expect(screen.queryByRole("option", { name: /Claire Durand/ })).not.toBeInTheDocument();
+
+    // Entree choisit la personne, elle n'envoie pas encore le message.
+    await user.keyboard("{Enter}");
+    expect(onSend).not.toHaveBeenCalled();
+    expect(field).toHaveValue("Salut @Paul Martin ");
+
+    await user.type(field, "tu passes ?{Enter}");
+    expect(onSend).toHaveBeenCalledWith(`Salut @[Paul Martin](${PAUL}) tu passes ?`, undefined);
+  });
+
+  it("affiche une mention par le nom, jamais par sa syntaxe", () => {
+    setup({}, [makeMessage({ id: "m", author_id: "user-other", content: `@[Paul Martin](${PAUL}) les plans` })]);
+    expect(screen.getByText("@Paul Martin")).toBeInTheDocument();
+    expect(screen.queryByText(/\]\(/)).not.toBeInTheDocument();
+  });
+
+  it("modifier un message garde ses mentions", async () => {
+    const { user, onEdit } = setup({ mentionable: people }, [
+      makeMessage({ id: "mine", author_id: ME, content: `@[Paul Martin](${PAUL}) les plans` }),
+    ]);
+    await user.click(within(messageBlock("mine")).getByRole("button", { name: "Modifier" }));
+    const field = within(messageBlock("mine")).getByRole("textbox");
+    expect(field).toHaveValue("@Paul Martin les plans");
+    await user.type(field, " sont la");
+    await user.click(within(messageBlock("mine")).getByRole("button", { name: "Enregistrer" }));
+    expect(onEdit).toHaveBeenCalledWith("mine", `@[Paul Martin](${PAUL}) les plans sont la`);
+  });
+});

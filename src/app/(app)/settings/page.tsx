@@ -11,6 +11,7 @@ import Button from "@/components/ui/Button";
 import Avatar from "@/components/ui/Avatar";
 import OrgLegalForm from "@/components/settings/OrgLegalForm";
 import CreateOrgModal from "@/components/settings/CreateOrgModal";
+import NotificationSettings from "@/components/settings/NotificationSettings";
 import { apiFetch, ApiError } from "@/lib/api";
 import { uploadFile } from "@/lib/upload";
 import { useAuth } from "@/contexts/AuthContext";
@@ -508,6 +509,8 @@ export default function SettingsPage() {
       </Card>
 
       {isAdmin && org.data ? <OrgLegalForm org={org.data} /> : null}
+
+      <NotificationSettings />
 
       <Card>
         <div className="flex flex-col gap-4">
