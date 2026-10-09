@@ -655,6 +655,20 @@ const it: Dict = {
   "notifPrefs.membershipDesc": "Quando qualcuno la aggiunge al team di un cantiere",
   "notifPrefs.reports": "Segnalazioni",
   "notifPrefs.reportsDesc": "Contenuti o membri segnalati nella sua organizzazione",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Permessi predefiniti dei ruoli",
+  "roleDefaults.intro": "Ciò che una persona vede arrivando in un cantiere, in base al suo ruolo. Salvare un ruolo applica i suoi permessi anche ai membri già presenti nei cantieri.",
+  "roleDefaults.role": "Ruolo",
+  "roleDefaults.members": "Membri nei cantieri: {count}",
+  "roleDefaults.customized": "personalizzato",
+  "roleDefaults.save": "Salva e applica",
+  "roleDefaults.reset": "Valori originali",
+  "roleDefaults.confirmTitle": "Applicare a tutti i membri «{role}»?",
+  "roleDefaults.confirmBody": "I permessi di {count} membro/i saranno sostituiti in tutti i cantieri dell'organizzazione, compresi quelli modificati a mano.",
+  "roleDefaults.resetTitle": "Ripristinare i valori originali per «{role}»?",
+  "roleDefaults.applied": "Permessi applicati a {count} membro/i",
+  "roleDefaults.adminNote": "Gli amministratori dell'organizzazione hanno sempre accesso a tutto, qualunque sia il loro ruolo nel cantiere.",
 };
 
 export default it;

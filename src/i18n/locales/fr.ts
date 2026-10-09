@@ -655,6 +655,20 @@ const fr: Dict = {
   "notifPrefs.membershipDesc": "Quand on vous ajoute à l'équipe d'un chantier",
   "notifPrefs.reports": "Signalements",
   "notifPrefs.reportsDesc": "Contenus ou membres signalés dans votre organisation",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Droits par défaut des rôles",
+  "roleDefaults.intro": "Ce qu'une personne voit en arrivant sur un chantier, selon son rôle. Enregistrer un rôle applique aussi ses droits aux membres déjà présents sur les chantiers.",
+  "roleDefaults.role": "Rôle",
+  "roleDefaults.members": "Membres sur les chantiers : {count}",
+  "roleDefaults.customized": "personnalisé",
+  "roleDefaults.save": "Enregistrer et appliquer",
+  "roleDefaults.reset": "Valeurs d'origine",
+  "roleDefaults.confirmTitle": "Appliquer à tous les membres « {role} » ?",
+  "roleDefaults.confirmBody": "Les droits de {count} membre(s) seront remplacés sur tous les chantiers de l'organisation, y compris ceux ajustés à la main.",
+  "roleDefaults.resetTitle": "Revenir aux valeurs d'origine pour « {role} » ?",
+  "roleDefaults.applied": "Droits appliqués à {count} membre(s)",
+  "roleDefaults.adminNote": "Les administrateurs de l'organisation ont toujours accès à tout, quel que soit leur rôle sur le chantier.",
 };
 
 export default fr;

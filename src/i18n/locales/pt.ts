@@ -655,6 +655,20 @@ const pt: Dict = {
   "notifPrefs.membershipDesc": "Quando o adicionam à equipa de uma obra",
   "notifPrefs.reports": "Denúncias",
   "notifPrefs.reportsDesc": "Conteúdos ou membros denunciados na sua organização",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Permissões predefinidas das funções",
+  "roleDefaults.intro": "O que uma pessoa vê ao chegar a uma obra, consoante a sua função. Guardar uma função aplica também as suas permissões aos membros que já estão nas obras.",
+  "roleDefaults.role": "Função",
+  "roleDefaults.members": "Membros nas obras: {count}",
+  "roleDefaults.customized": "personalizado",
+  "roleDefaults.save": "Guardar e aplicar",
+  "roleDefaults.reset": "Valores originais",
+  "roleDefaults.confirmTitle": "Aplicar a todos os membros «{role}»?",
+  "roleDefaults.confirmBody": "As permissões de {count} membro(s) serão substituídas em todas as obras da organização, incluindo as ajustadas manualmente.",
+  "roleDefaults.resetTitle": "Repor os valores originais para «{role}»?",
+  "roleDefaults.applied": "Permissões aplicadas a {count} membro(s)",
+  "roleDefaults.adminNote": "Os administradores da organização têm sempre acesso a tudo, seja qual for a sua função na obra.",
 };
 
 export default pt;

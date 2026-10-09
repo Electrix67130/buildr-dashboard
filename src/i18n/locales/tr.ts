@@ -655,6 +655,20 @@ const tr: Dict = {
   "notifPrefs.membershipDesc": "Bir şantiye ekibine eklendiğinizde",
   "notifPrefs.reports": "Bildirilen içerikler",
   "notifPrefs.reportsDesc": "Kuruluşunuzda bildirilen içerikler veya üyeler",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Rollerin varsayılan izinleri",
+  "roleDefaults.intro": "Bir kişinin bir şantiyeye katıldığında rolüne göre gördükleri. Bir rolü kaydetmek, izinlerini şantiyelerdeki mevcut üyelere de uygular.",
+  "roleDefaults.role": "Rol",
+  "roleDefaults.members": "Şantiyelerdeki üyeler: {count}",
+  "roleDefaults.customized": "özelleştirilmiş",
+  "roleDefaults.save": "Kaydet ve uygula",
+  "roleDefaults.reset": "Orijinal değerler",
+  "roleDefaults.confirmTitle": "Tüm “{role}” üyelerine uygulansın mı?",
+  "roleDefaults.confirmBody": "Kuruluşun tüm şantiyelerinde {count} üyenin izinleri, elle ayarlananlar dahil, değiştirilecek.",
+  "roleDefaults.resetTitle": "“{role}” için orijinal değerlere dönülsün mü?",
+  "roleDefaults.applied": "İzinler {count} üyeye uygulandı",
+  "roleDefaults.adminNote": "Kuruluş yöneticileri, şantiyedeki rolleri ne olursa olsun her şeye her zaman erişebilir.",
 };
 
 export default tr;

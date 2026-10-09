@@ -313,3 +313,20 @@ export interface NotificationPreferences {
   /** Les chantiers dont le reglage n'est pas « tout ». */
   chantiers: { chantier_id: string; chantier_name: string; level: Exclude<ChantierNotificationLevel, "all"> }[];
 }
+
+export type RolePermissionFlag =
+  | "can_view_comments"
+  | "can_view_photos"
+  | "can_view_documents"
+  | "can_view_steps"
+  | "can_view_team"
+  | "can_edit";
+
+/** Droits de depart d'un role dans l'organisation (GET /role-permissions). */
+export type RolePermissionsView = Record<RolePermissionFlag, boolean> & {
+  role: ChantierMemberRole;
+  /** Faux : ce sont les valeurs d'origine. */
+  customized: boolean;
+  /** Membres de ce role sur les chantiers de l'organisation. */
+  member_count: number;
+};

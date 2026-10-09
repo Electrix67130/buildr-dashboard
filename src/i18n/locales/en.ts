@@ -657,6 +657,20 @@ const en: Dict = {
   "notifPrefs.membershipDesc": "When you are added to a site team",
   "notifPrefs.reports": "Reports",
   "notifPrefs.reportsDesc": "Content or members reported in your organisation",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Default role permissions",
+  "roleDefaults.intro": "What a person sees when joining a site, depending on their role. Saving a role also applies its permissions to members already on the sites.",
+  "roleDefaults.role": "Role",
+  "roleDefaults.members": "Members on sites: {count}",
+  "roleDefaults.customized": "customised",
+  "roleDefaults.save": "Save and apply",
+  "roleDefaults.reset": "Original values",
+  "roleDefaults.confirmTitle": "Apply to all “{role}” members?",
+  "roleDefaults.confirmBody": "The permissions of {count} member(s) will be replaced on every site in the organisation, including those adjusted by hand.",
+  "roleDefaults.resetTitle": "Restore the original values for “{role}”?",
+  "roleDefaults.applied": "Permissions applied to {count} member(s)",
+  "roleDefaults.adminNote": "Organisation administrators always have full access, whatever their role on the site.",
 };
 
 export default en;

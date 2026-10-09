@@ -655,6 +655,20 @@ const es: Dict = {
   "notifPrefs.membershipDesc": "Cuando le añaden al equipo de una obra",
   "notifPrefs.reports": "Denuncias",
   "notifPrefs.reportsDesc": "Contenidos o miembros denunciados en su organización",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Permisos por defecto de los roles",
+  "roleDefaults.intro": "Lo que una persona ve al llegar a una obra, según su rol. Guardar un rol aplica también sus permisos a los miembros que ya están en las obras.",
+  "roleDefaults.role": "Rol",
+  "roleDefaults.members": "Miembros en las obras: {count}",
+  "roleDefaults.customized": "personalizado",
+  "roleDefaults.save": "Guardar y aplicar",
+  "roleDefaults.reset": "Valores originales",
+  "roleDefaults.confirmTitle": "¿Aplicar a todos los miembros «{role}»?",
+  "roleDefaults.confirmBody": "Se sustituirán los permisos de {count} miembro(s) en todas las obras de la organización, incluidos los ajustados a mano.",
+  "roleDefaults.resetTitle": "¿Restablecer los valores originales para «{role}»?",
+  "roleDefaults.applied": "Permisos aplicados a {count} miembro(s)",
+  "roleDefaults.adminNote": "Los administradores de la organización siempre tienen acceso a todo, sea cual sea su rol en la obra.",
 };
 
 export default es;

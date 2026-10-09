@@ -655,6 +655,20 @@ const pl: Dict = {
   "notifPrefs.membershipDesc": "Gdy ktoś doda Cię do zespołu budowy",
   "notifPrefs.reports": "Zgłoszenia",
   "notifPrefs.reportsDesc": "Treści lub członkowie zgłoszeni w Twojej organizacji",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Domyślne uprawnienia ról",
+  "roleDefaults.intro": "Co widzi osoba po dołączeniu do budowy, w zależności od roli. Zapisanie roli stosuje jej uprawnienia także do członków, którzy już są na budowach.",
+  "roleDefaults.role": "Rola",
+  "roleDefaults.members": "Członkowie na budowach: {count}",
+  "roleDefaults.customized": "dostosowane",
+  "roleDefaults.save": "Zapisz i zastosuj",
+  "roleDefaults.reset": "Wartości pierwotne",
+  "roleDefaults.confirmTitle": "Zastosować do wszystkich członków „{role}”?",
+  "roleDefaults.confirmBody": "Uprawnienia {count} członków zostaną zastąpione na wszystkich budowach organizacji, także tam, gdzie zmieniono je ręcznie.",
+  "roleDefaults.resetTitle": "Przywrócić wartości pierwotne dla „{role}”?",
+  "roleDefaults.applied": "Uprawnienia zastosowano do {count} członków",
+  "roleDefaults.adminNote": "Administratorzy organizacji zawsze mają pełny dostęp, niezależnie od roli na budowie.",
 };
 
 export default pl;

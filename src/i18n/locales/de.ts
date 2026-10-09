@@ -655,6 +655,20 @@ const de: Dict = {
   "notifPrefs.membershipDesc": "Wenn Sie zum Team einer Baustelle hinzugefügt werden",
   "notifPrefs.reports": "Meldungen",
   "notifPrefs.reportsDesc": "Gemeldete Inhalte oder Mitglieder in Ihrer Organisation",
+
+  // Droits par defaut des roles
+  "roleDefaults.title": "Standardrechte der Rollen",
+  "roleDefaults.intro": "Was eine Person beim Beitritt zu einer Baustelle sieht, je nach Rolle. Das Speichern einer Rolle überträgt ihre Rechte auch auf Mitglieder, die bereits auf den Baustellen sind.",
+  "roleDefaults.role": "Rolle",
+  "roleDefaults.members": "Mitglieder auf Baustellen: {count}",
+  "roleDefaults.customized": "angepasst",
+  "roleDefaults.save": "Speichern und anwenden",
+  "roleDefaults.reset": "Ursprüngliche Werte",
+  "roleDefaults.confirmTitle": "Auf alle Mitglieder „{role}“ anwenden?",
+  "roleDefaults.confirmBody": "Die Rechte von {count} Mitglied(ern) werden auf allen Baustellen der Organisation ersetzt, auch dort, wo sie von Hand angepasst wurden.",
+  "roleDefaults.resetTitle": "Für „{role}“ die ursprünglichen Werte wiederherstellen?",
+  "roleDefaults.applied": "Rechte auf {count} Mitglied(er) angewendet",
+  "roleDefaults.adminNote": "Administratoren der Organisation haben immer vollen Zugriff, unabhängig von ihrer Rolle auf der Baustelle.",
 };
 
 export default de;
