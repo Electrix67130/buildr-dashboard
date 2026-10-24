@@ -430,7 +430,7 @@ const es: Dict = {
   "invite.accept": "Crear mi cuenta",
   "invite.welcome": "Bienvenido a {org}",
   "invite.mobileHint": "Una vez creada su cuenta, encuentre sus obras en la aplicación móvil Buildr.",
-  "invite.openInApp": "Abrir en la aplicación",
+  "invite.openInApp": "¿Ya la tiene instalada? Abrir en la aplicación",
   "invite.getApp": "Descargar la aplicación",
   "invite.readyTitle": "Su cuenta está lista",
   "invite.readyBody": "Instale la aplicación Buildr y luego inicie sesión con {email}.",

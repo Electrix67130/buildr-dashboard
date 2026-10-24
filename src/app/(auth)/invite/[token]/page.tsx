@@ -190,17 +190,6 @@ export default function InvitePage() {
 
   return (
     <>
-      {platform !== "desktop" ? (
-        // Le lien https ouvre deja l'app quand elle est installee (liens
-        // universels). Ce bouton couvre les navigateurs integres, Gmail ou
-        // Outlook, qui ne passent pas la main a l'app.
-        <a href={`buildr://invite/${token}`} className="mb-6 block">
-          <Button variant="secondary" className="w-full">
-            {t("invite.openInApp")}
-          </Button>
-        </a>
-      ) : null}
-
       <h1 className="mb-1 text-2xl font-bold text-zinc-900 dark:text-white">
         {t("invite.title", { org: data.organization_name })}
       </h1>
@@ -269,7 +258,19 @@ export default function InvitePage() {
             Google Play
           </a>
         </div>
-      ) : null}
+      ) : (
+        // Le lien https ouvre deja l'app quand elle est installee (liens
+        // universels). Ce lien couvre les navigateurs integres, Gmail ou
+        // Outlook, qui ne passent pas la main a l'app. Le navigateur ne peut
+        // pas savoir si l'app est installee : sans elle, `buildr://` ne mene
+        // nulle part, d'ou un simple lien discret plutot qu'un bouton.
+        <a
+          href={`buildr://invite/${token}`}
+          className="mt-3 block text-center text-xs font-semibold text-orange-600 hover:underline"
+        >
+          {t("invite.openInApp")}
+        </a>
+      )}
     </>
   );
 }

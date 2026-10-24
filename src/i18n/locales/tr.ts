@@ -430,7 +430,7 @@ const tr: Dict = {
   "invite.accept": "Hesabımı oluştur",
   "invite.welcome": "{org} ekibine hoş geldiniz",
   "invite.mobileHint": "Hesabınız oluşturulduğunda şantiyelerinizi Buildr mobil uygulamasında bulabilirsiniz.",
-  "invite.openInApp": "Uygulamada aç",
+  "invite.openInApp": "Zaten yüklü mü? Uygulamada açın",
   "invite.getApp": "Uygulamayı indirin",
   "invite.readyTitle": "Hesabınız hazır",
   "invite.readyBody": "Buildr uygulamasını yükleyin, ardından {email} ile giriş yapın.",
