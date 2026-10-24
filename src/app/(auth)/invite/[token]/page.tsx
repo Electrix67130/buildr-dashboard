@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, FormEvent } from "react";
+import { useState, useEffect, useSyncExternalStore, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -30,6 +30,27 @@ interface InvitationInfo {
 
 // Cles i18n plutot que libelles : la page d'invitation est vue par des gens
 // qui n'ont pas encore de compte, donc pas encore de langue enregistree.
+// L'app iOS (eas.json, submit.production.ios.ascAppId) et l'app Android.
+const STORE_URLS = {
+  ios: "https://apps.apple.com/app/id6806975992",
+  android: "https://play.google.com/store/apps/details?id=fr.getbuildr.app",
+} as const;
+
+type Platform = "ios" | "android" | "desktop";
+
+// Le serveur ne connait pas l'appareil : il rend la version « desktop », le
+// client corrige a l'hydratation. L'appareil ne change pas en cours de route,
+// d'ou l'abonnement vide.
+const subscribeNever = () => () => {};
+const serverPlatform = (): Platform => "desktop";
+
+function detectPlatform(): Platform {
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua)) return "ios";
+  if (/Android/i.test(ua)) return "android";
+  return "desktop";
+}
+
 const ROLE_LABEL_KEYS: Record<string, string> = {
   admin: "role.adminLong",
   manager: "role.managerLong",
@@ -47,6 +68,11 @@ export default function InvitePage() {
 
   const [form, setForm] = useState({ first_name: "", last_name: "", phone: "", password: "" });
   const [submitting, setSubmitting] = useState(false);
+  const platform = useSyncExternalStore(subscribeNever, detectPlatform, serverPlatform);
+  // Sur telephone, le compte cree, on ne bascule pas sur le dashboard : un
+  // ouvrier y trouverait un outil de bureau, alors que ses chantiers sont dans
+  // l'app. On l'envoie la telecharger.
+  const [createdOnMobile, setCreatedOnMobile] = useState(false);
 
   const { data, isLoading, error, refetch, isFetching } = useQuery<InvitationInfo, ApiError>({
     queryKey: ["invitation", token],
@@ -59,8 +85,8 @@ export default function InvitePage() {
   // compte. On le renvoie vers son espace plutot que de le laisser en creer un
   // second sans comprendre pourquoi ca echoue.
   useEffect(() => {
-    if (!authLoading && isAuthenticated) router.replace("/dashboard");
-  }, [authLoading, isAuthenticated, router]);
+    if (!authLoading && isAuthenticated && !createdOnMobile) router.replace("/dashboard");
+  }, [authLoading, isAuthenticated, createdOnMobile, router]);
 
   function update<K extends keyof typeof form>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }));
@@ -74,6 +100,7 @@ export default function InvitePage() {
       return;
     }
     setSubmitting(true);
+    if (platform !== "desktop") setCreatedOnMobile(true);
     try {
       // L'email n'est pas transmis depuis le formulaire : l'API reprend celui
       // de l'invitation, qui fait foi.
@@ -86,12 +113,34 @@ export default function InvitePage() {
         invitation_token: token,
       });
       toast.success(t("invite.welcome", { org: data.organization_name }));
-      router.replace("/dashboard");
+      if (platform === "desktop") router.replace("/dashboard");
     } catch (err) {
+      setCreatedOnMobile(false);
       toast.error(err instanceof ApiError ? err.message : t("common.error"));
     } finally {
       setSubmitting(false);
     }
+  }
+
+  if (createdOnMobile && isAuthenticated && data) {
+    return (
+      <div className="flex flex-col gap-4">
+        <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{t("invite.readyTitle")}</h1>
+        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+          {t("invite.readyBody", { email: data.email })}
+        </p>
+        <a href={STORE_URLS[platform === "ios" ? "ios" : "android"]}>
+          <Button className="w-full" size="lg">
+            {t("invite.getApp")}
+          </Button>
+        </a>
+        <Link href="/dashboard">
+          <Button variant="ghost" className="w-full">
+            {t("invite.continueWeb")}
+          </Button>
+        </Link>
+      </div>
+    );
   }
 
   if (isLoading) {
@@ -141,6 +190,17 @@ export default function InvitePage() {
 
   return (
     <>
+      {platform !== "desktop" ? (
+        // Le lien https ouvre deja l'app quand elle est installee (liens
+        // universels). Ce bouton couvre les navigateurs integres, Gmail ou
+        // Outlook, qui ne passent pas la main a l'app.
+        <a href={`buildr://invite/${token}`} className="mb-6 block">
+          <Button variant="secondary" className="w-full">
+            {t("invite.openInApp")}
+          </Button>
+        </a>
+      ) : null}
+
       <h1 className="mb-1 text-2xl font-bold text-zinc-900 dark:text-white">
         {t("invite.title", { org: data.organization_name })}
       </h1>
@@ -200,6 +260,16 @@ export default function InvitePage() {
       <p className="mt-6 text-center text-xs text-zinc-500 dark:text-zinc-400">
         {t("invite.mobileHint")}
       </p>
+      {platform === "desktop" ? (
+        <div className="mt-3 flex justify-center gap-4 text-xs font-semibold">
+          <a href={STORE_URLS.ios} className="text-orange-600 hover:underline">
+            App Store
+          </a>
+          <a href={STORE_URLS.android} className="text-orange-600 hover:underline">
+            Google Play
+          </a>
+        </div>
+      ) : null}
     </>
   );
 }
