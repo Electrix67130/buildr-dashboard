@@ -54,7 +54,7 @@ function detectPlatform(): Platform {
 const ROLE_LABEL_KEYS: Record<string, string> = {
   admin: "role.adminLong",
   manager: "role.managerLong",
-  employee: "role.ouvrier",
+  employee: "role.employee",
   client: "role.client",
   gestionnaire_reseau: "role.gestionnaireReseau",
 };
